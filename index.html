@@ -1,196 +1,195 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <style>
-        :root {
-            --multiplier: 1;
-            --wild-multiplier: 1;
-        }
-
-        .slot-machine {
-            display: grid;
-            grid-template-columns: repeat(6, 1fr);
-            gap: 3px;
-            background: #2a2a2a;
-            padding: 15px;
-            border-radius: 15px;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .slot {
-            width: 80px;
-            height: 80px;
-            border: 2px solid #ffd700;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 40px;
-            background: #1a1a1a;
-            position: relative;
-            transition: transform 0.3s;
-        }
-
-        .wild {
-            color: #ff4545;
-            animation: wild-pulse 1s infinite;
-        }
-
-        .xways {
-            background: url('xways-pattern.png');
-            background-size: cover;
-        }
-
-        @keyframes wild-pulse {
-            0%, 100% { transform: scale(1); }
-            50% { transform: scale(1.2); }
-        }
-
-        .explosion {
-            position: absolute;
-            width: 100%;
-            height: 100%;
-            background: radial-gradient(circle, #ff8800 0%, transparent 70%);
-            animation: explode 0.5s forwards;
-        }
-
-        .multiplier-display {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            font-size: 24px;
-            color: #ffd700;
-            text-shadow: 0 0 10px #ffd700;
-        }
-    </style>
+  <meta charset="UTF-8">
+  <title>No Limit Enhanced Slot Machine</title>
+  <style>
+    body {
+      background: radial-gradient(circle, #1a1a1a, #000);
+      font-family: Arial, sans-serif;
+      color: #fff;
+      text-align: center;
+      margin: 0;
+      padding: 20px;
+    }
+    h1 {
+      margin-bottom: 20px;
+    }
+    /* Container for the 6x6 grid using CSS Grid */
+    .slot-grid {
+      display: grid;
+      grid-template-columns: repeat(6, 60px);
+      grid-gap: 5px;
+      justify-content: center;
+      margin-bottom: 20px;
+    }
+    .slot-cell {
+      width: 60px;
+      height: 60px;
+      font-size: 32px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      border: 2px solid #fff;
+      background: #222;
+      border-radius: 10%;
+    }
+    /* Simple animation to simulate a spin effect */
+    .spin-animation {
+      animation: spin 0.5s ease;
+    }
+    @keyframes spin {
+      0% { transform: scale(1) rotate(0deg); }
+      50% { transform: scale(1.1) rotate(15deg); }
+      100% { transform: scale(1) rotate(0deg); }
+    }
+    .results {
+      margin-top: 20px;
+    }
+    button {
+      padding: 10px 20px;
+      font-size: 16px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      background-color: #ff9900;
+      color: #000;
+    }
+  </style>
 </head>
 <body>
-    <div class="multiplier-display">Multiplier: <span id="multValue">1x</span></div>
-    <div class="slot-machine" id="machine"></div>
-    <button onclick="game.spin()" id="spinBtn">SPIN (Balance: <span id="balance">1000</span>)</button>
-
-    <script>
-        class NolimitSlot {
-            constructor() {
-                this.symbols = ['🍒', '🍋', '🔔', '💎', '7️⃣', '🌟', '💣', '🔄', '🐉'];
-                this.reels = [];
-                this.multiplier = 1;
-                this.freeSpins = 0;
-                this.balance = 1000;
-                this.initMachine();
-                this.xNudgeActive = false;
-                this.xWaysActive = false;
-            }
-
-            initMachine() {
-                const machine = document.getElementById('machine');
-                machine.innerHTML = '';
-                for(let i = 0; i < 36; i++) {
-                    const slot = document.createElement('div');
-                    slot.className = 'slot';
-                    machine.appendChild(slot);
-                    this.reels.push(slot);
-                }
-            }
-
-            async spin() {
-                if(this.balance < 50) return alert('Insufficient funds!');
-                this.balance -= 50;
-                this.updateBalance();
-
-                try {
-                    await this.animatePreSpin();
-                    const spinResult = this.generateSpin();
-                    await this.animateSpinResult(spinResult);
-                    
-                    let totalWin = 0;
-                    do {
-                        totalWin += this.checkWins();
-                    } while(this.applyCascadingReels());
-                    
-                    if(totalWin > 0) {
-                        this.handleWin(totalWin);
-                    }
-                    
-                    this.checkBonusFeatures();
-                } catch(error) {
-                    console.error('Spin error:', error);
-                    alert('Spin failed! Please refresh');
-                }
-            }
-
-            applyCascadingReels() {
-                // Implement cascading reels with xWays expansion
-                const cascades = this.reels.filter(slot => 
-                    slot.classList.contains('winning')).length;
-                
-                if(cascades > 0) {
-                    this.reels.forEach(slot => {
-                        if(slot.classList.contains('winning')) {
-                            slot.innerHTML = '';
-                            slot.classList.remove('winning');
-                        }
-                    });
-                    
-                    // Apply xWays expansion (symbol splitting)
-                    this.reels.forEach(slot => {
-                        if(Math.random() < 0.3) {
-                            slot.classList.add('xways');
-                            slot.innerHTML += this.symbols[Math.floor(Math.random()*this.symbols.length)];
-                        }
-                    });
-                    
-                    return true;
-                }
-                return false;
-            }
-
-            handleWin(amount) {
-                const winAmount = amount * this.multiplier;
-                this.balance += winAmount;
-                this.multiplier += winAmount / 1000;
-                this.updateBalance();
-                this.showWinAnimation(winAmount);
-                
-                // Apply xNudge mechanic to wilds
-                document.querySelectorAll('.wild').forEach(wild => {
-                    wild.style.transform = `translateY(${Math.random() < 0.5 ? '-' : ''}20px)`;
-                    this.multiplier += 0.1;
-                });
-            }
-
-            checkBonusFeatures() {
-                // Randomly trigger xNudge or xWays
-                if(Math.random() < 0.15) this.triggerXNudge();
-                if(Math.random() < 0.1) this.triggerXWays();
-                if(this.reels.some(s => s.textContent === '🌟')) this.triggerFreeSpins();
-            }
-
-            triggerXNudge() {
-                this.xNudgeActive = true;
-                document.querySelectorAll('.slot').forEach(slot => {
-                    if(slot.textContent === '🐉') { // Dragon wild
-                        slot.classList.add('wild');
-                        slot.style.transform = 'scale(1.5)';
-                    }
-                });
-                setTimeout(() => this.xNudgeActive = false, 5000);
-            }
-
-            triggerXWays() {
-                this.xWaysActive = true;
-                this.reels.forEach(slot => {
-                    if(Math.random() < 0.4) {
-                        slot.classList.add('xways');
-                        slot.innerHTML += this.symbols[Math.floor(Math.random()*this.symbols.length)];
-                    }
-                });
-                setTimeout(() => this.xWaysActive = false, 3000);
-            }
+  <h1>No Limit Enhanced Slot Machine</h1>
+  
+  <!-- Slot grid (6x6) -->
+  <div class="slot-grid" id="slotGrid"></div>
+  
+  <!-- Score and spin button -->
+  <div class="results">
+    <p>Tokens: <span id="tokenCount">0</span></p>
+    <button id="spinButton">Spin</button>
+  </div>
+  
+  <!-- Audio elements for sound effects. Replace "spin.mp3" and "win.mp3" with your own files -->
+  <audio id="spinSound" src="spin.mp3"></audio>
+  <audio id="winSound" src="win.mp3"></audio>
+  
+  <script>
+    // Define available symbols; an extra symbol (🍀) was added for variety.
+    const symbols = ["🍒", "🍋", "🔔", "💎", "7️⃣", "🍀"];
+    let tokens = 0;
+    
+    const gridElement = document.getElementById("slotGrid");
+    const tokenDisplay = document.getElementById("tokenCount");
+    const spinButton = document.getElementById("spinButton");
+    const spinSound = document.getElementById("spinSound");
+    const winSound = document.getElementById("winSound");
+    
+    // Create a 6x6 grid (36 cells)
+    const gridCells = [];
+    for (let i = 0; i < 36; i++) {
+      const cell = document.createElement("div");
+      cell.classList.add("slot-cell");
+      // Set each cell to a random symbol initially
+      cell.innerText = symbols[Math.floor(Math.random() * symbols.length)];
+      gridElement.appendChild(cell);
+      gridCells.push(cell);
+    }
+    
+    // Helper function to play a given audio element
+    function playSound(audioElement) {
+      if (audioElement) {
+        audioElement.currentTime = 0;
+        audioElement.play();
+      }
+    }
+    
+    // Spin the slot machine
+    function spin() {
+      playSound(spinSound); // Play spin sound
+      
+      // Change each cell’s symbol with a quick animation
+      gridCells.forEach(cell => {
+        cell.classList.add("spin-animation");
+        cell.innerText = symbols[Math.floor(Math.random() * symbols.length)];
+      });
+      
+      // Remove animation class after it's done and check for wins
+      setTimeout(() => {
+        gridCells.forEach(cell => cell.classList.remove("spin-animation"));
+        checkWin();
+      }, 500);
+    }
+    
+    // Check for winning combinations horizontally and vertically.
+    // Here, earning tokens is based on getting three or more consecutive same symbols.
+    function checkWin() {
+      let winAmount = 0;
+      
+      // Horizontal win check for each row
+      for (let row = 0; row < 6; row++) {
+        let count = 1;
+        let currentSymbol = gridCells[row * 6].innerText;
+        for (let col = 1; col < 6; col++) {
+          let cellSymbol = gridCells[row * 6 + col].innerText;
+          if (cellSymbol === currentSymbol) {
+            count++;
+          } else {
+            if (count >= 3) { winAmount += getWinAmount(currentSymbol, count); }
+            currentSymbol = cellSymbol;
+            count = 1;
+          }
         }
-
-        const game = new NolimitSlot();
-        // Helper functions omitted for brevity
-    </script>
+        if (count >= 3) { winAmount += getWinAmount(currentSymbol, count); }
+      }
+      
+      // Vertical win check for each column
+      for (let col = 0; col < 6; col++) {
+        let count = 1;
+        let currentSymbol = gridCells[col].innerText;
+        for (let row = 1; row < 6; row++) {
+          let cellSymbol = gridCells[row * 6 + col].innerText;
+          if (cellSymbol === currentSymbol) {
+            count++;
+          } else {
+            if (count >= 3) { winAmount += getWinAmount(currentSymbol, count); }
+            currentSymbol = cellSymbol;
+            count = 1;
+          }
+        }
+        if (count >= 3) { winAmount += getWinAmount(currentSymbol, count); }
+      }
+      
+      // If wins occur, update tokens and play a win sound effect
+      if (winAmount > 0) {
+        tokens += winAmount;
+        tokenDisplay.innerText = tokens;
+        playSound(winSound);
+      }
+    }
+    
+    // Calculate win amount based on symbol and number of consecutive hits.
+    function getWinAmount(symbol, count) {
+      // Base winnings for exactly three in a row
+      if (count === 3) {
+        if (symbol === "🍒") return 50;
+        if (symbol === "🍋") return 100;
+        if (symbol === "🔔") return 150;
+        if (symbol === "💎") return 300;
+        if (symbol === "7️⃣") return 500;
+        // For any additional symbol like 🍀 use a fallback value
+        return 50;
+      }
+      // For more than 3 consecutive, add a bonus per extra symbol
+      let bonus = (count - 3) * 20;
+      if (symbol === "🍒") return 50 + bonus;
+      if (symbol === "🍋") return 100 + bonus;
+      if (symbol === "🔔") return 150 + bonus;
+      if (symbol === "💎") return 300 + bonus;
+      if (symbol === "7️⃣") return 500 + bonus;
+      return 50 + bonus;
+    }
+    
+    spinButton.addEventListener("click", spin);
+  </script>
 </body>
 </html>
