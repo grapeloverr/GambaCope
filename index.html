@@ -4,13 +4,16 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Luxury 6x6 Slot Machine</title>
+    <!-- Stylesheets -->
     <link rel="stylesheet" href="styles/main.css">
     <link rel="stylesheet" href="styles/animations.css">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
 <body>
+    <!-- Game Container -->
     <div class="game-container">
+        <!-- Header -->
         <div class="game-header">
             <div class="logo">DARK FORTUNE</div>
             <div class="multiplier-display">
@@ -32,70 +35,49 @@
             </div>
         </div>
 
+        <!-- Slot Machine -->
         <div class="slot-machine">
             <div class="grid-container">
                 <!-- Grid will be dynamically populated -->
             </div>
-            <div class="win-overlay">
+            <!-- Win Overlay -->
+            <div class="win-overlay hidden">
                 <div class="win-amount">+500</div>
                 <div class="win-text">BIG WIN</div>
             </div>
-            <div class="bonus-overlay">
-                <div class="bonus-title">FREE SPINS ACTIVATED</div>
-                <div class="bonus-subtitle">10 FREE SPINS</div>
-                <div class="bonus-multiplier">ALL WINS x3</div>
+            <!-- Bonus Overlay -->
+            <div class="bonus-overlay hidden">
+                <h2>FREE SPINS ACTIVATED!</h2>
+                <p>10 FREE SPINS</p>
+                <p>ALL WINS x3 MULTIPLIER</p>
             </div>
         </div>
 
+        <!-- Controls -->
         <div class="game-controls">
-            <div class="bet-controls">
-                <button id="decrease-bet" class="control-btn"><i class="fas fa-minus"></i></button>
-                <div class="bet-display">
-                    <span class="bet-label">BET</span>
-                    <span id="bet-amount">50</span>
-                </div>
-                <button id="increase-bet" class="control-btn"><i class="fas fa-plus"></i></button>
-            </div>
+            <!-- Bet Controls -->
+            <button id="decrease-bet" class="control-btn"><i class="fas fa-minus"></i></button>
+            <span id="bet-amount" class="bet-display">50</span>
+            <button id="increase-bet" class="control-btn"><i class="fas fa-plus"></i></button>
+
+            <!-- Spin Controls -->
             <button id="spin-button" class="spin-btn">SPIN</button>
+
+            <!-- Other Controls -->
             <button id="auto-spin" class="control-btn">AUTO</button>
             <button id="max-bet" class="control-btn">MAX BET</button>
-            <button id="info-button" class="control-btn"><i class="fas fa-info-circle"></i></button>
         </div>
-    </div>
 
-    <div class="info-panel">
-        <div class="info-content">
+        <!-- Info Panel -->
+        <section id="info-panel" class="hidden">
             <h2>Game Rules</h2>
-            <div class="rules-content">
-                <p>Match 3 or more symbols in any direction to win.</p>
-                <p>Consecutive wins increase your multiplier:</p>
-                <ul>
-                    <li>1st Win: 1x</li>
-                    <li>2nd Win: 1.5x</li>
-                    <li>3rd Win: 2x</li>
-                    <li>4th Win: 3x</li>
-                    <li>5th Win: 5x</li>
-                    <li>6th+ Win: 8x</li>
-                </ul>
-                <h3>Bonus Feature</h3>
-                <p>Collect 3 bonus symbols to activate 10 FREE SPINS with a 3x multiplier on all wins!</p>
-                <h3>Symbol Values</h3>
-                <div class="symbol-values">
-                    <!-- Symbol values will be added here -->
-                </div>
-            </div>
-            <button id="close-info" class="close-btn">CLOSE</button>
-        </div>
+            <p>Match 3 or more symbols in any direction to win.</p>
+            ...
+        </section>
     </div>
 
-    <script src="scripts/utils.js"></script>
-    <script src="scripts/symbols.js"></script>
-    <script src="scripts/grid.js"></script>
-    <script src="scripts/multiplier.js"></script>
-    <script src="scripts/animations.js"></script>
-    <script src="scripts/audio.js"></script>
-    <script src="scripts/bonus.js"></script>
-    <script src="scripts/game.js"></script>
-    <script src="scripts/main.js"></script>
+    <!-- Scripts -->
+    <script src="./scripts/utils.js"></script>
+    ...
 </body>
 </html>
