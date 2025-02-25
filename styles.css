@@ -1,43 +1,29 @@
-:root {
-    --dark-bg: #0f1624;
-    --darker-bg: #0a0f1d;
-    --panel-bg: #1a2235;
-    --neon-accent: #00f3ff;
-    --btn-green: #00c853;
-    --text-primary: rgba(255,255,255,.9);
-    --text-secondary: rgba(255,255,255,.6);
-}
-
-* {
+/* General Styling */
+body {
+    font-family: Arial, sans-serif;
+    background-color: #0f1624;
+    color: #ffffff;
     margin: 0;
     padding: 0;
-    box-sizing: border-box;
-}
-
-body {
-    font-family: 'Arial', sans-serif;
-    background-color: var(--darker-bg);
-    color: var(--text-primary);
-    min-height: 100vh;
     display: flex;
     justify-content: center;
     align-items: center;
+    height: 100vh;
 }
 
 .game-container {
-    width: 100%;
-    max-width: 1200px;
-    background-color: var(--dark-bg);
+    width: 700px;
+    background-color: #1a2235;
     border-radius: 10px;
-    overflow: hidden;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+    padding: 20px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
 }
 
+/* Header Section */
 .game-header {
     display: flex;
     justify-content: space-between;
-    padding: 20px;
-    background-color: var(--panel-bg);
+    align-items: center;
 }
 
 .bet-controls {
@@ -45,249 +31,64 @@ body {
     gap: 20px;
 }
 
-.control-section {
+.bet-amount,
+.lines-control {
     display: flex;
     flex-direction: column;
-    gap: 10px;
 }
 
-.toggle-buttons {
-    display: flex;
-    border-radius: 20px;
-    overflow: hidden;
-    background-color: var(--darker-bg);
-    width: fit-content;
-}
-
-.toggle-btn {
-    padding: 8px 20px;
-    border: none;
-    background-color: transparent;
-    color: var(--text-primary);
-    cursor: pointer;
-}
-
-.toggle-btn.active {
-    background-color: var(--panel-bg);
-}
-
-.bet-amount, .lines, .bet-per-line {
-    display: flex;
-    flex-direction: column;
-    font-size: 14px;
-}
-
-.bet-value {
-    color: var(--text-secondary);
-    font-size: 12px;
-}
-
-.bet-input {
-    display: flex;
-    align-items: center;
-    gap: 5px;
-}
-
-#bet-input {
-    width: 80px;
+input[type='number'],
+select {
     padding: 5px;
-    background-color: var(--darker-bg);
-    border: 1px solid var(--panel-bg);
-    color: var(--text-primary);
-    border-radius: 4px;
-}
-
-.bet-btn {
-    padding: 5px 10px;
-    background-color: var(--darker-bg);
-    border: 1px solid var(--panel-bg);
-    color: var(--text-primary);
-    border-radius: 4px;
-    cursor: pointer;
-}
-
-.dropdown {
-    position: relative;
-    display: inline-block;
-}
-
-.dropdown-btn {
-    padding: 5px 10px;
-    background-color: var(--darker-bg);
-    border: 1px solid var(--panel-bg);
-    color: var(--text-primary);
-    border-radius: 4px;
-    cursor: pointer;
-    width: 80px;
-    text-align: left;
-}
-
-.dropdown-content {
-    display: none;
-    position: absolute;
-    background-color: var(--panel-bg);
-    min-width: 80px;
-    box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
-    z-index: 1;
-}
-
-.dropdown-content a {
-    color: var(--text-primary);
-    padding: 8px 12px;
-    text-decoration: none;
-    display: block;
-}
-
-.dropdown:hover .dropdown-content {
-    display: block;
-}
-
-#spin-btn {
-    padding: 10px 40px;
-    background-color: var(--btn-green);
+    font-size: 16px;
+    border-radius: 5px;
     border: none;
-    color: white;
-    font-weight: bold;
-    border-radius: 4px;
-    cursor: pointer;
-    align-self: flex-end;
 }
 
-.payout-display {
-    background-color: var(--darker-bg);
+.spin-button {
+    background-color: #00c853;
+    color: #ffffff;
+    font-size: 16px;
     padding: 10px 20px;
-    border-radius: 4px;
-    align-self: flex-start;
+    border-radius: 5px;
+    border: none;
+    cursor: pointer;
 }
 
+.spin-button:hover {
+    background-color: #00a843;
+}
+
+.balance-display {
+    font-size: 18px;
+}
+
+/* Slot Machine Reels */
 .slot-machine {
     display: flex;
-    justify-content: center;
-    padding: 20px;
-    background-color: var(--darker-bg);
-}
-
-.payline-numbers {
-    display: flex;
-    flex-direction: column;
-    justify-content: space-around;
-    padding: 10px;
-}
-
-.payline-numbers div {
-    width: 20px;
-    height: 20px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    font-size: 12px;
-}
-
-.reels-container {
-    display: flex;
-    gap: 5px;
-    background-color: var(--panel-bg);
-    padding: 10px;
-    border-radius: 5px;
+    justify-content: space-between;
+    margin-top: 20px;
 }
 
 .reel {
+    width: 120px;
+    height: 300px;
+    background-color: #0a0f1d;
+    border-radius: 10px;
+    overflow: hidden;
     display: flex;
-    flex-direction: column;
-    gap: 5px;
+    flex-direction: column-reverse; /* Symbols will "spin" upwards */
 }
 
 .symbol {
-    width: 100px;
-    height: 100px;
-    background-color: var(--darker-bg);
-    border-radius: 5px;
+    width: 100%;
+    height: 100px; /* Symbol height */
     display: flex;
     justify-content: center;
     align-items: center;
-    background-size: cover;
-    background-position: center;
 }
 
+/* Footer Section */
 .game-footer {
-    display: flex;
-    justify-content: space-between;
-    padding: 10px 20px;
-    background-color: var(--panel-bg);
-    border-top: 1px solid var(--darker-bg);
-}
-
-.footer-btn {
-    background: none;
-    border: none;
-    color: var(--text-secondary);
-    font-size: 20px;
-    cursor: pointer;
-}
-
-.footer-brand {
-    color: var(--text-secondary);
-    font-size: 14px;
-}
-
-/* Symbol images */
-.symbol-scarab {
-    background-image: url('symbols/scarab.png');
-}
-
-.symbol-pharaoh {
-    background-image: url('symbols/pharaoh.png');
-}
-
-.symbol-eye {
-    background-image: url('symbols/eye.png');
-}
-
-.symbol-ankh {
-    background-image: url('symbols/ankh.png');
-}
-
-.symbol-gem-blue {
-    background-image: url('symbols/gem-blue.png');
-}
-
-.symbol-gem-green {
-    background-image: url('symbols/gem-green.png');
-}
-
-.symbol-gem-purple {
-    background-image: url('symbols/gem-purple.png');
-}
-
-.symbol-spade {
-    background-image: url('symbols/spade.png');
-}
-
-.symbol-club {
-    background-image: url('symbols/club.png');
-}
-
-.symbol-diamond {
-    background-image: url('symbols/diamond.png');
-}
-
-/* Animation for spinning */
-@keyframes spin {
-    0% { transform: translateY(0); }
-    100% { transform: translateY(-300%); }
-}
-
-.reel.spinning .symbol {
-    animation: spin 0.5s infinite linear;
-}
-
-/* Win animation */
-@keyframes pulse {
-    0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(0, 243, 255, 0.7); }
-    50% { transform: scale(1.05); box-shadow: 0 0 0 10px rgba(0, 243, 255, 0); }
-    100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(0, 243, 255, 0); }
-}
-
-.symbol.win {
-    animation: pulse 1s infinite;
+    margin-top: 20px;
 }
