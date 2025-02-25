@@ -1,156 +1,235 @@
-// Game variables
-let tokens = 1000;
-const spinCost = 10;
-let isSpinning = false;
-let multiplier = 1;
-
-// Symbols with their probabilities and values
-const symbols = [
-    { symbol: '♠', value: 50, probability: 30 },
-    { symbol: '♥', value: 100, probability: 20 },
-    { symbol: '♦', value: 150, probability: 15 },
-    { symbol: '♣', value: 300, probability: 10 },
-    { symbol: '★', value: 500, probability: 5 },
-    { symbol: '⚡', value: 1000, probability: 3 },
-    { symbol: '♞', value: 2000, probability: 2 },
-    { symbol: '♟', value: 5000, probability: 1 },
-    { symbol: '❓', value: 0, probability: 24 }
-];
-
-// Initialize
-updateTokenDisplay();
-
-// Spin button click event
-document.getElementById('spin-btn').addEventListener('click', () => {
-    if (isSpinning) return;
+document.addEventListener('DOMContentLoaded', function() {
+    // Elements
+    const spinButton = document.getElementById('spin-btn');
+    const manualButton = document.getElementById('manual-btn');
+    const autoButton = document.getElementById('auto-btn');
+    const betInput = document.getElementById('bet-input');
+    const tokenCountElement = document.querySelector('.bet-value');
+    const payoutDisplay = document.querySelector('.payout-display span');
+    const reels = document.querySelectorAll('.reel');
+    const symbols = document.querySelectorAll('.symbol');
     
-    if (tokens < spinCost) {
-        document.getElementById('result-text').textContent = "Not enough tokens!";
-        document.getElementById('result-text').style.color = "#ff5252";
-        return;
-    }
+    // Game variables
+    let balance = 1000;
+    let currentBet = 0.00;
+    let isSpinning = false;
+    let autoSpin = false;
+    let selectedLines = 20;
     
-    // Deduct tokens
-    tokens -= spinCost;
-    updateTokenDisplay();
+    // Symbol definitions with probabilities and values
+    const symbolTypes = [
+        { name: 'coin', class: 'symbol-coin', value: 500, probability: 5 },
+        { name: 'pharaoh', class: 'symbol-pharaoh', value: 300, probability: 10 },
+        { name: 'scarab', class: 'symbol-scarab', value: 150, probability: 15 },
+        { name: 'ankh', class: 'symbol-ankh', value: 100, probability: 20 },
+        { name: 'blue-gem', class: 'symbol-blue-gem', value: 50, probability: 25 },
+        { name: 'blue-spade', class: 'symbol-blue-spade', value: 30, probability: 30 },
+        { name: 'purple-club', class: 'symbol-purple-club', value: 20, probability: 35 },
+        { name: 'green-diamond', class: 'symbol-green-diamond', value: 10, probability: 40 }
+    ];
     
-    // Start spinning
-    isSpinning = true;
-    document.getElementById('spin-btn').disabled = true;
-    document.getElementById('result-text').textContent = "";
+    // Paylines configuration
+    const paylines = [
+        // Horizontal lines
+        [0, 1, 2, 3, 4], // Top row
+        [5, 6, 7, 8, 9], // Middle row
+        [10, 11, 12, 13, 14], // Bottom row
+        // V-shaped lines
+        [0, 6, 12, 8, 4],
+        [10, 6, 2, 8, 14],
+        // Zigzag lines
+        [0, 6, 2, 8, 4],
+        [10, 6, 12, 8, 14],
+        // And more complex patterns...
+    ];
     
-    // Animate reels
-    spinReels();
-});
-
-// Auto spin functionality
-document.getElementById('auto-spin-btn').addEventListener('click', () => {
-    let autoSpin = !autoSpin;
-    if (autoSpin) {
-        document.getElementById('auto-spin-btn').textContent = "Stop Auto Spin";
-        document.getElementById('spin-btn').disabled = true;
-        autoSpinLoop();
-    } else {
-        document.getElementById('auto-spin-btn').textContent = "Auto Spin";
-        document.getElementById('spin-btn').disabled = false;
-    }
-});
-
-function autoSpinLoop() {
-    if (autoSpin && tokens >= spinCost) {
-        document.getElementById('spin-btn').click();
-        setTimeout(autoSpinLoop, 2000); // Spin every 2 seconds
-    }
-}
-
-function spinReels() {
-    // Generate final results first
-    const results = Array.from({length: 36}, () => getRandomSymbol());
-    
-    // Animation variables
-    const spinDuration = 2000; // 2 seconds
-    const startTime = Date.now();
-    
-    // Animation function
-    function animate() {
-        const elapsed = Date.now() - startTime;
-        const progress = Math.min(elapsed / spinDuration, 1);
+    // Initialize the game
+    function initGame() {
+        updateBalanceDisplay();
+        initializeSymbols();
         
-        // Update reels with random symbols during animation
-        document.querySelectorAll('.reel').forEach((reel, index) => {
-            // Stop reels one by one
-            if (progress < 0.7 + (index % 6 * 0.1)) {
-                reel.textContent = symbols[Math.floor(Math.random() * symbols.length)].symbol;
-            } else {
-                // Show final result
-                reel.textContent = results[index].symbol;
+        // Event listeners
+        spinButton.addEventListener('click', spin);
+        manualButton.addEventListener('click', () => toggleMode('manual'));
+        autoButton.addEventListener('click', () => toggleMode('auto'));
+        betInput.addEventListener('input', updateBetAmount);
+        
+        // Half and double bet buttons
+        document.querySelector('.half').addEventListener('click', () => adjustBet(0.5));
+        document.querySelector('.double').addEventListener('click', () => adjustBet(2));
+    }
+    
+    function initializeSymbols() {
+        symbols.forEach(symbol => {
+            const randomSymbol = getRandomSymbol();
+            symbol.className = 'symbol ' + randomSymbol.class;
+            symbol.dataset.name = randomSymbol.name;
+            symbol.dataset.value = randomSymbol.value;
+        });
+    }
+    
+    function getRandomSymbol() {
+        // Create probability array
+        const probabilityArray = [];
+        symbolTypes.forEach(symbol => {
+            for (let i = 0; i < symbol.probability; i++) {
+                probabilityArray.push(symbol);
             }
         });
         
-        // Continue animation or end
-        if (progress < 1) {
-            requestAnimationFrame(animate);
+        // Return random symbol based on probability
+        return probabilityArray[Math.floor(Math.random() * probabilityArray.length)];
+    }
+    
+    function toggleMode(mode) {
+        if (mode === 'manual') {
+            manualButton.classList.add('active');
+            autoButton.classList.remove('active');
+            autoSpin = false;
         } else {
-            // Animation complete, check for wins
-            checkWin(results);
-            isSpinning = false;
-            document.getElementById('spin-btn').disabled = false;
+            manualButton.classList.remove('active');
+            autoButton.classList.add('active');
+            autoSpin = true;
+            autoSpinLoop();
         }
     }
     
-    // Start animation
-    animate();
-}
-
-function getRandomSymbol() {
-    // Create array based on probabilities
-    const probabilityArray = [];
-    
-    for (const item of symbols) {
-        for (let i = 0; i < item.probability; i++) {
-            probabilityArray.push(item);
-        }
+    function updateBetAmount() {
+        currentBet = parseFloat(betInput.value) || 0;
+        document.querySelectorAll('.bet-value')[0].textContent = currentBet.toFixed(8) + ' LTC';
+        
+        // Update bet per line
+        const betPerLine = (currentBet / selectedLines) || 0;
+        document.querySelectorAll('.bet-value')[1].textContent = betPerLine.toFixed(8) + ' LTC';
     }
     
-    // Return random symbol
-    return probabilityArray[Math.floor(Math.random() * probabilityArray.length)];
-}
-
-function checkWin(results) {
-    // Check for horizontal lines, diagonal clusters, and mystery bonuses
-    let winAmount = 0;
-    let winMessage = "";
+    function adjustBet(multiplier) {
+        currentBet = parseFloat(betInput.value) || 0;
+        currentBet = Math.max(0, currentBet * multiplier);
+        betInput.value = currentBet.toFixed(2);
+        updateBetAmount();
+    }
     
-    // Horizontal lines
-    for (let row = 0; row < 6; row++) {
-        for (let col = 0; col < 4; col++) {
-            const line = results.slice(row * 6 + col, row * 6 + col + 3);
-            if (line.every(symbol => symbol.symbol === line[0].symbol && symbol.symbol !== '❓')) {
-                winAmount += line[0].value * multiplier;
-                winMessage += `Horizontal win: ${line[0].symbol} x3 = ${line[0].value * multiplier} tokens. `;
+    function updateBalanceDisplay() {
+        tokenCountElement.textContent = balance.toFixed(8) + ' LTC';
+    }
+    
+    function spin() {
+        if (isSpinning || currentBet <= 0 || currentBet > balance) {
+            // Can't spin if already spinning, no bet, or bet > balance
+            return;
+        }
+        
+        // Deduct bet amount
+        balance -= currentBet;
+        updateBalanceDisplay();
+        
+        isSpinning = true;
+        spinButton.disabled = true;
+        
+        // Reset previous wins
+        symbols.forEach(symbol => symbol.classList.remove('win'));
+        payoutDisplay.textContent = 'Total Payout: $0.00';
+        
+        // Start spinning animation
+        reels.forEach((reel, index) => {
+            reel.classList.add('spinning');
+            
+            // Stagger the stopping of reels
+            setTimeout(() => {
+                stopReel(reel, index);
+            }, 1000 + (index * 300));
+        });
+        
+        // Check for wins after all reels have stopped
+        setTimeout(checkWins, 2500);
+    }
+    
+    function stopReel(reel, reelIndex) {
+        reel.classList.remove('spinning');
+        
+        // Set new symbols
+        const reelSymbols = reel.querySelectorAll('.symbol');
+        reelSymbols.forEach((symbol, symbolIndex) => {
+            const randomSymbol = getRandomSymbol();
+            symbol.className = 'symbol ' + randomSymbol.class;
+            symbol.dataset.name = randomSymbol.name;
+            symbol.dataset.value = randomSymbol.value;
+        });
+    }
+    
+    function checkWins() {
+        let totalWin = 0;
+        
+        // Check each active payline
+        for (let i = 0; i < selectedLines; i++) {
+            if (i < paylines.length) {
+                const line = paylines[i];
+                const lineSymbols = [];
+                
+                // Get symbols on this payline
+                line.forEach(position => {
+                    const row = Math.floor(position / 5);
+                    const col = position % 5;
+                    const symbolElement = document.getElementById(`symbol-${col}-${row}`);
+                    lineSymbols.push(symbolElement);
+                });
+                
+                // Check for matches
+                const firstSymbol = lineSymbols[0].dataset.name;
+                let matchCount = 1;
+                
+                for (let j = 1; j < lineSymbols.length; j++) {
+                    if (lineSymbols[j].dataset.name === firstSymbol) {
+                        matchCount++;
+                    } else {
+                        break;
+                    }
+                }
+                
+                // Calculate win for this line
+                if (matchCount >= 3) {
+                    const symbolValue = parseInt(lineSymbols[0].dataset.value);
+                    const betPerLine = currentBet / selectedLines;
+                    const lineWin = symbolValue * betPerLine * (matchCount - 2);
+                    totalWin += lineWin;
+                    
+                    // Highlight winning symbols
+                    for (let j = 0; j < matchCount; j++) {
+                        lineSymbols[j].classList.add('win');
+                    }
+                }
             }
         }
+        
+        // Update balance and display
+        if (totalWin > 0) {
+            balance += totalWin;
+            updateBalanceDisplay();
+            payoutDisplay.textContent = `Total Payout: $${totalWin.toFixed(2)}`;
+        }
+        
+        // Reset game state
+        isSpinning = false;
+        spinButton.disabled = false;
+        
+        // Continue auto-spin if enabled
+        if (autoSpin) {
+            setTimeout(spin, 1000);
+        }
     }
     
-    // Diagonal clusters
-    // Implement diagonal win check here
-    
-    // Mystery bonuses
-    // Implement mystery bonus check here
-    
-    if (winAmount > 0) {
-        tokens += winAmount;
-        updateTokenDisplay();
-        document.getElementById('result-text').textContent = winMessage + `Total win: +${winAmount} tokens`;
-        document.getElementById('result-text').style.color = "#4caf50";
-        multiplier++;
-    } else {
-        document.getElementById('result-text').textContent = "Try again!";
-        document.getElementById('result-text').style.color = "#ff9800";
-        multiplier = 1;
+    function autoSpinLoop() {
+        if (autoSpin && balance >= currentBet) {
+            spin();
+            setTimeout(autoSpinLoop, 3000);
+        } else {
+            autoSpin = false;
+            autoButton.classList.remove('active');
+            manualButton.classList.add('active');
+        }
     }
-}
-
-function updateTokenDisplay() {
-    document.getElementById('token-count').textContent = tokens;
-}
+    
+    // Initialize the game
+    initGame();
+});
