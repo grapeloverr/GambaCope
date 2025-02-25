@@ -1,87 +1,64 @@
-/* General Reset */
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
+:root {
+    --dark-bg: #0f1624;
+    --panel-bg: #1a2235;
+    --neon-accent: #00f3ff;
+    --green-accent: #00c853;
+    --text-primary: rgba(255, 255, 255, 0.9);
 }
 
 body {
     font-family: Arial, sans-serif;
-    background-color: #0a0f1d;
-    color: #fff;
+    background-color: var(--dark-bg);
+    color: var(--text-primary);
+    margin: 0;
     display: flex;
     justify-content: center;
     align-items: center;
     height: 100vh;
 }
 
-/* Game Container */
 .game-container {
-    width: 400px;
-    background-color: #1a2235;
+    width: 100%;
+    max-width: 1200px;
+    background-color: var(--panel-bg);
     padding: 20px;
     border-radius: 10px;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
 }
 
-/* Header */
 .header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 20px;
 }
 
-.bet-controls input {
-    width: 60px;
+.bet-controls {
+    display: flex;
+    flex-direction: column;
+}
+
+.bet-amount,
+.lines-control,
+.bet-per-line {
+    margin-bottom: 10px;
+}
+
+input[type='number'],
+select {
     padding: 5px;
 }
 
-.bet-controls button {
-    padding: 5px 10px;
-    margin-left: 5px;
-    background-color: #00f3ff;
-    border: none;
-    border-radius: 5px;
-    color: #000;
-    cursor: pointer;
+.spin-btn {
+    padding: 10px 20px;
+    background-color: var(--green-accent);
+    color: white;
 }
 
-.balance-display {
-    font-size: 16px;
-}
-
-/* Slot Machine */
 .slot-machine {
     display: flex;
-    justify-content: space-between;
-    margin-bottom: 20px;
 }
 
-.reel-container {
-    width: 100px;
-    height: 150px;
-    background-color: #0f1624;
-    border-radius: 5px;
-    overflow: hidden;
+.reels-container {
+    display: flex;
 }
-
-.symbol {
-    width: 100%;
-    height: 50px;
-    text-align: center;
-    line-height: 50px;
+.reel {
 }
-
-/* Loading Spinner */
-.loading-spinner {
-    display: none; /* Initially hidden */
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-}
-
-.loading-spinner::before {
-    content: '';
-    width: 40px;
