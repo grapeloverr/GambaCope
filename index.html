@@ -5,151 +5,30 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Cope Tokens Slot Machine</title>
     <style>
-        body {
-            font-family: 'Arial', sans-serif;
-            background-color: #121212;
-            color: #ffffff;
-            text-align: center;
-            margin: 0;
-            padding: 20px;
-            overflow: hidden;
-        }
-
-        .container {
-            max-width: 800px;
-            margin: 0 auto;
-            background-color: #1e1e1e;
-            border-radius: 15px;
-            padding: 30px;
-            box-shadow: 0 0 30px rgba(0, 0, 0, 0.7);
-            border: 2px solid #ff9800;
-        }
-
-        h1 {
-            color: #ff9800;
-            font-size: 36px;
-            margin-bottom: 30px;
-            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
-        }
-
-        .slot-machine {
-            display: grid;
-            grid-template-columns: repeat(5, 100px);
-            grid-template-rows: repeat(3, 100px);
-            gap: 15px;
-            justify-content: center;
-            margin: 20px 0;
-            perspective: 1000px;
-        }
-
-        .reel {
-            width: 100px;
-            height: 100px;
-            background-color: #222;
-            border-radius: 10px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            font-size: 50px;
-            box-shadow: inset 0 0 15px rgba(0, 0, 0, 0.8), 0 0 20px rgba(255, 152, 0, 0.5);
-            transition: transform 0.3s;
-            transform-style: preserve-3d;
-        }
-
-        .reel:hover {
-            transform: scale(1.1);
-        }
-
-        #spin-btn {
-            background-color: #ff9800;
-            color: white;
-            border: none;
-            padding: 15px 40px;
-            font-size: 20px;
-            border-radius: 10px;
-            cursor: pointer;
-            margin: 20px 0;
-            transition: background-color 0.3s, transform 0.3s;
-            box-shadow: 0 0 20px rgba(255, 152, 0, 0.5);
-        }
-
-        #spin-btn:hover {
-            background-color: #f57c00;
-            transform: scale(1.05);
-        }
-
-        #spin-btn:disabled {
-            background-color: #666;
-            cursor: not-allowed;
-            box-shadow: none;
-        }
-
-        .tokens {
-            font-size: 28px;
-            margin: 20px 0;
-            color: #ffeb3b;
-            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
-        }
-
-        .result {
-            font-size: 24px;
-            height: 30px;
-            margin: 20px 0;
-            color: #4caf50;
-            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
-        }
-
-        .symbols {
-            margin-top: 30px;
-            font-size: 16px;
-            color: #aaa;
-            text-align: left;
-        }
-
-        .bonus-info {
-            font-size: 20px;
-            color: #ffeb3b;
-            margin-top: 20px;
-            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
-        }
-
-        @keyframes spin {
-            0% { transform: rotateX(0deg); }
-            100% { transform: rotateX(360deg); }
-        }
-
-        @keyframes shine {
-            0% { opacity: 0; }
-            50% { opacity: 1; }
-            100% { opacity: 0; }
-        }
-
-        .reel.spinning {
-            animation: spin 1s infinite linear;
-        }
-
-        .reel.winning {
-            animation: shine 1s infinite;
-        }
-
-        .multiplier {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            font-size: 36px;
-            color: #ffeb3b;
-            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
-            animation: shine 1s infinite;
-        }
+        body { font-family: Arial, sans-serif; background-color: #121212; color: #ffffff; text-align: center; margin: 0; padding: 20px; overflow: hidden; }
+        .container { max-width: 800px; margin: 0 auto; background-color: #1e1e1e; border-radius: 15px; padding: 30px; box-shadow: 0 0 30px rgba(0, 0, 0, 0.7); border: 2px solid #ff9800; }
+        h1 { color: #ff9800; font-size: 36px; margin-bottom: 30px; text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5); }
+        .slot-machine { display: grid; grid-template-columns: repeat(5, 100px); grid-template-rows: repeat(3, 100px); gap: 15px; justify-content: center; margin: 20px 0; perspective: 1000px; }
+        .reel { width: 100px; height: 100px; background-color: #222; border-radius: 10px; display: flex; justify-content: center; align-items: center; font-size: 50px; box-shadow: inset 0 0 15px rgba(0, 0, 0, 0.8), 0 0 20px rgba(255, 152, 0, 0.5); transition: transform 0.3s; transform-style: preserve-3d; }
+        .reel:hover { transform: scale(1.1); }
+        #spin-btn { background-color: #ff9800; color: white; border: none; padding: 15px 40px; font-size: 20px; border-radius: 10px; cursor: pointer; margin: 20px 0; transition: background-color 0.3s, transform 0.3s; box-shadow: 0 0 20px rgba(255, 152, 0, 0.5); }
+        #spin-btn:hover { background-color: #f57c00; transform: scale(1.05); }
+        #spin-btn:disabled { background-color: #666; cursor: not-allowed; box-shadow: none; }
+        .tokens { font-size: 28px; margin: 20px 0; color: #ffeb3b; text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5); }
+        .result { font-size: 24px; height: 30px; margin: 20px 0; color: #4caf50; text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5); }
+        .symbols { margin-top: 30px; font-size: 16px; color: #aaa; text-align: left; }
+        .bonus-info { font-size: 20px; color: #ffeb3b; margin-top: 20px; text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5); }
+        @keyframes spin { 0% { transform: rotateX(0deg); } 100% { transform: rotateX(360deg); } }
+        @keyframes shine { 0% { opacity: 0; } 50% { opacity: 1; } 100% { opacity: 0; } }
+        .reel.spinning { animation: spin 1s infinite linear; }
+        .reel.winning { animation: shine 1s infinite; }
+        .multiplier { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 36px; color: #ffeb3b; text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5); animation: shine 1s infinite; }
     </style>
 </head>
 <body>
     <div class="container">
         <h1>Cope Tokens Slot Machine</h1>
-
         <div class="tokens">Tokens: <span id="token-count">1000</span></div>
-
         <div class="slot-machine">
             <div class="reel" id="reel1">?</div>
             <div class="reel" id="reel2">?</div>
@@ -167,13 +46,9 @@
             <div class="reel" id="reel14">?</div>
             <div class="reel" id="reel15">?</div>
         </div>
-
         <button id="spin-btn">SPIN (10 tokens)</button>
-
         <div class="result" id="result-text"></div>
-
         <div class="bonus-info" id="bonus-info"></div>
-
         <div class="symbols">
             <p><strong>Winning Combinations:</strong></p>
             <p>🍒 🍒 🍒 = 50 tokens</p>
@@ -185,30 +60,11 @@
             <p>🍇 🍇 🍇 = Bonus Round (10 free spins)</p>
         </div>
     </div>
-
     <audio id="spin-sound" src="https://www.soundjay.com/button/beep-07.wav" preload="auto"></audio>
     <audio id="win-sound" src="https://www.soundjay.com/button/beep-09.wav" preload="auto"></audio>
     <audio id="bonus-sound" src="https://www.soundjay.com/button/beep-08.wav" preload="auto"></audio>
-
     <script>
-        // Elements
-        const reels = [
-            document.getElementById('reel1'),
-            document.getElementById('reel2'),
-            document.getElementById('reel3'),
-            document.getElementById('reel4'),
-            document.getElementById('reel5'),
-            document.getElementById('reel6'),
-            document.getElementById('reel7'),
-            document.getElementById('reel8'),
-            document.getElementById('reel9'),
-            document.getElementById('reel10'),
-            document.getElementById('reel11'),
-            document.getElementById('reel12'),
-            document.getElementById('reel13'),
-            document.getElementById('reel14'),
-            document.getElementById('reel15')
-        ];
+        const reels = Array.from({ length: 15 }, (_, i) => document.getElementById(`reel${i + 1}`));
         const spinButton = document.getElementById('spin-btn');
         const tokenCountElement = document.getElementById('token-count');
         const resultTextElement = document.getElementById('result-text');
@@ -217,15 +73,13 @@
         const winSound = document.getElementById('win-sound');
         const bonusSound = document.getElementById('bonus-sound');
 
-        // Game variables
         let tokens = 1000;
         const spinCost = 10;
         let isSpinning = false;
         let freeSpins = 0;
-        let lastDailyReward = localStorage.getItem('lastDailyReward');
         let currentMultiplier = 1;
+        const userId = 'YOUR_USER_ID';
 
-        // Symbols with their probabilities and values
         const symbols = [
             { symbol: '🍒', value: 50, probability: 30 },
             { symbol: '🍋', value: 100, probability: 20 },
@@ -233,131 +87,85 @@
             { symbol: '💎', value: 300, probability: 10 },
             { symbol: '7️⃣', value: 500, probability: 5 },
             { symbol: '❓', value: 0, probability: 20 },
-            { symbol: '🍇', value: 0, probability: 5 } // Wild Grape
+            { symbol: '🍇', value: 0, probability: 5 }
         ];
 
-        // Multipliers for the bonus round
         const multipliers = [2, 4, 8, 16, 32];
 
-        // Initialize
-        updateTokenDisplay();
-        checkDailyReward();
+        function updateTokenDisplay() {
+            tokenCountElement.textContent = tokens;
+        }
 
-        // Spin button click event
-        spinButton.addEventListener('click', () => {
-            if (isSpinning) return;
-
-            if (tokens < spinCost && freeSpins === 0) {
-                resultTextElement.textContent = "Not enough tokens!";
-                resultTextElement.style.color = "#ff5252";
-                return;
-            }
-
-            // Deduct tokens if not in free spins
-            if (freeSpins === 0) {
-                tokens -= spinCost;
+        function checkDailyReward() {
+            const now = new Date();
+            const lastRewardDate = localStorage.getItem('lastDailyReward');
+            if (!lastRewardDate || (now - new Date(lastRewardDate)) >= 86400000) {
+                tokens += 333;
+                fetch('/update-tokens', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ userId, tokens })
+                });
                 updateTokenDisplay();
-            } else {
-                freeSpins--;
-                if (freeSpins === 0) {
-                    spinButton.textContent = "SPIN (10 tokens)";
-                    bonusInfoElement.textContent = "";
-                }
+                localStorage.setItem('lastDailyReward', now.toISOString());
+                resultTextElement.textContent = "Daily reward claimed! +333 tokens";
+                resultTextElement.style.color = "#ffeb3b";
+                winSound.play();
             }
+        }
 
-            // Start spinning
-            isSpinning = true;
-            spinButton.disabled = true;
-            resultTextElement.textContent = "";
-            spinSound.play();
-
-            // Animate reels
-            spinReels();
-        });
-
-        function spinReels() {
-            // Generate final results first
-            const results = [
-                getRandomSymbol(),
-                getRandomSymbol(),
-                getRandomSymbol(),
-                getRandomSymbol(),
-                getRandomSymbol(),
-                getRandomSymbol(),
-                getRandomSymbol(),
-                getRandomSymbol(),
-                getRandomSymbol(),
-                getRandomSymbol(),
-                getRandomSymbol(),
-                getRandomSymbol(),
-                getRandomSymbol(),
-                getRandomSymbol(),
-                getRandomSymbol()
-            ];
-
-            // Animation variables
-            const spinDuration = 2000; // 2 seconds
+        async function spinReels() {
+            const results = Array.from({ length: 15 }, () => getRandomSymbol());
+            const spinDuration = 2000;
             const startTime = Date.now();
 
-            // Animation function
             function animate() {
                 const elapsed = Date.now() - startTime;
                 const progress = Math.min(elapsed / spinDuration, 1);
 
-                // Update reels with random symbols during animation
-                for (let i = 0; i < reels.length; i++) {
-                    // Stop reels one by one with a cascading effect
+                reels.forEach((reel, i) => {
                     if (progress < 0.7 + (Math.floor(i / 5) * 0.1)) {
-                        reels[i].textContent = symbols[Math.floor(Math.random() * symbols.length)].symbol;
-                        reels[i].classList.add('spinning');
+                        reel.textContent = symbols[Math.floor(Math.random() * symbols.length)].symbol;
+                        reel.classList.add('spinning');
                     } else {
-                        // Show final result
-                        reels[i].textContent = results[i].symbol;
-                        reels[i].classList.remove('spinning');
+                        reel.textContent = results[i].symbol;
+                        reel.classList.remove('spinning');
                     }
-                }
+                });
 
-                // Continue animation or end
                 if (progress < 1) {
                     requestAnimationFrame(animate);
                 } else {
-                    // Animation complete, check for wins
                     checkWin(results);
                     isSpinning = false;
                     spinButton.disabled = false;
                 }
             }
 
-            // Start animation
             animate();
         }
 
         function getRandomSymbol() {
-            // Create array based on probabilities
             const probabilityArray = [];
-
-            for (const item of symbols) {
+            symbols.forEach(item => {
                 for (let i = 0; i < item.probability; i++) {
                     probabilityArray.push(item);
                 }
-            }
-
-            // Return random symbol
+            });
             return probabilityArray[Math.floor(Math.random() * probabilityArray.length)];
         }
 
         function checkWin(results) {
-            // Check for three matching symbols in a row
             const winLines = [
-                [0, 1, 2], [3, 4, 5], [6, 7, 8], [9, 10, 11], [12, 13, 14], // Horizontal lines
-                [0, 3, 6], [1, 4, 7], [2, 5, 8], [9, 12, 13], [10, 13, 14], // Vertical lines
-                [0, 4, 8], [2, 4, 6], [9, 11, 13], [10, 12, 14] // Diagonal lines
+                [0, 1, 2], [3, 4, 5], [6, 7, 8], [9, 10, 11], [12, 13, 14],
+                [0, 3, 6], [1, 4, 7], [2, 5, 8], [9, 12, 13], [10, 13, 14],
+                [0, 4, 8], [2, 4, 6], [9, 11, 13], [10, 12, 14]
             ];
 
             let winAmount = 0;
             let bonusTriggered = false;
 
-            for (const line of winLines) {
+            winLines.forEach(line => {
                 const [a, b, c] = line;
                 if (results[a].symbol === results[b].symbol && results[b].symbol === results[c].symbol) {
                     if (results[a].symbol === '🍇') {
@@ -369,12 +177,17 @@
                         reels[c].classList.add('winning');
                     }
                 }
-            }
+            });
 
             if (bonusTriggered) {
                 triggerBonusRound();
             } else if (winAmount > 0) {
                 tokens += winAmount * currentMultiplier;
+                fetch('/update-tokens', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ userId, tokens })
+                });
                 updateTokenDisplay();
                 resultTextElement.textContent = `Winner! +${winAmount * currentMultiplier} tokens`;
                 resultTextElement.style.color = "#4caf50";
@@ -383,22 +196,24 @@
                     reels.forEach(reel => reel.classList.remove('winning'));
                 }, 1000);
             } else {
-                // Check for two matching symbols
-                for (const line of winLines) {
+                winLines.forEach(line => {
                     const [a, b, c] = line;
                     if (results[a].symbol === results[b].symbol ||
                         results[b].symbol === results[c].symbol ||
                         results[a].symbol === results[c].symbol) {
                         tokens += 5 * currentMultiplier;
+                        fetch('/update-tokens', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ userId, tokens })
+                        });
                         updateTokenDisplay();
                         resultTextElement.textContent = `Two matches! +${5 * currentMultiplier} tokens`;
                         resultTextElement.style.color = "#2196f3";
                         winSound.play();
                         return;
                     }
-                }
-
-                // No win
+                });
                 resultTextElement.textContent = "Try again!";
                 resultTextElement.style.color = "#ff9800";
             }
@@ -413,13 +228,11 @@
             isSpinning = false;
             bonusSound.play();
 
-            // Create multiplier display
             const multiplierDisplay = document.createElement('div');
             multiplierDisplay.classList.add('multiplier');
             multiplierDisplay.textContent = `Multiplier: x${currentMultiplier}`;
             document.body.appendChild(multiplierDisplay);
 
-            // Update multiplier display during bonus round
             const updateMultiplier = () => {
                 if (freeSpins > 0) {
                     currentMultiplier = multipliers[Math.min(Math.floor(Math.random() * multipliers.length), freeSpins - 1)];
@@ -429,37 +242,52 @@
                 }
             };
 
-            // Update multiplier before each spin in the bonus round
             const originalSpin = spinReels;
             spinReels = () => {
                 updateMultiplier();
                 originalSpin();
             };
 
-            // Remove multiplier display after bonus round
             setTimeout(() => {
                 document.body.removeChild(multiplierDisplay);
                 spinReels = originalSpin;
             }, 10000);
         }
 
-        function updateTokenDisplay() {
-            tokenCountElement.textContent = tokens;
-        }
+        spinButton.addEventListener('click', async () => {
+            if (isSpinning) return;
 
-        function checkDailyReward() {
-            const now = new Date();
-            const lastRewardDate = lastDailyReward ? new Date(lastDailyReward) : null;
-
-            if (!lastRewardDate || (now - lastRewardDate) >= 86400000) {
-                tokens += 333;
-                updateTokenDisplay();
-                localStorage.setItem('lastDailyReward', now.toISOString());
-                resultTextElement.textContent = "Daily reward claimed! +333 tokens";
-                resultTextElement.style.color = "#ffeb3b";
-                winSound.play();
+            if (tokens < spinCost && freeSpins === 0) {
+                resultTextElement.textContent = "Not enough tokens!";
+                resultTextElement.style.color = "#ff5252";
+                return;
             }
-        }
+
+            if (freeSpins === 0) {
+                await fetch('/spin', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ userId, betAmount: spinCost })
+                });
+                tokens -= spinCost;
+                updateTokenDisplay();
+            } else {
+                freeSpins--;
+                if (freeSpins === 0) {
+                    spinButton.textContent = "SPIN (10 tokens)";
+                    bonusInfoElement.textContent = "";
+                }
+            }
+
+            isSpinning = true;
+            spinButton.disabled = true;
+            resultTextElement.textContent = "";
+            spinSound.play();
+            spinReels();
+        });
+
+        updateTokenDisplay();
+        checkDailyReward();
     </script>
 </body>
 </html>
