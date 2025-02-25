@@ -1,98 +1,18 @@
-:root {
-    --bg-dark: #0a0f1d;
-    --neon-primary: #00f3ff;
-    --symbol-size: 6vmin;
-    --reel-gap: 1vmin;
-    --border-radius: 1vmin;
-    --spinner-size: 2.5vmin;
-    --win-glow: 0 0 15px var(--neon-primary);
-}
-
-body {
-    background: radial-gradient(circle at center, 
-        #0a1f2d 0%, 
-        var(--bg-dark) 100%);
-    height: 100vh;
-    margin: 0;
-    display: grid;
-    place-items: center;
-    font-family: 'Segoe UI', system-ui;
-    color: var(--neon-primary);
-    overflow: hidden;
-}
-
-.slot-machine {
-    width: 95vmin;
-    padding: 2vmin;
-    border: 2px solid var(--neon-primary);
-    border-radius: var(--border-radius);
-    box-shadow: 0 0 30px rgba(0, 243, 255, 0.2);
-}
-
-.reel-container {
-    position: relative;
-    margin: 3vmin 0;
-    height: calc(var(--symbol-size) * 3 + var(--reel-gap) * 2);
-    overflow: hidden;
-}
-
-.reels {
-    display: grid;
-    grid-template-columns: repeat(5, 1fr);
-    gap: var(--reel-gap);
-    position: absolute;
-    width: 100%;
-    height: 300%;
-    top: -100%;
-}
-
-.symbol {
-    width: var(--symbol-size);
-    height: var(--symbol-size);
-    background: rgba(0, 243, 255, 0.05);
-    border-radius: var(--border-radius);
-    display: grid;
-    place-items: center;
-    font-size: calc(var(--symbol-size) * 0.6);
-    transition: filter 0.3s ease;
-}
-
-.spin-button {
-    width: 100%;
-    padding: 2vmin;
-    background: linear-gradient(145deg, 
-        rgba(0, 243, 255, 0.1) 0%, 
-        rgba(0, 243, 255, 0.2) 100%);
-    border: 2px solid var(--neon-primary);
-    color: inherit;
-    font-size: 3vmin;
-    text-transform: uppercase;
-    letter-spacing: 2px;
-    cursor: pointer;
-    transition: all 0.3s ease;
-}
-
-/* Professional Animation System */
-@keyframes reel-spin {
-    0% { transform: translateY(0); }
-    100% { transform: translateY(calc(var(--symbol-size) * 3)); }
-}
-
-.winning-symbol {
-    animation: symbol-win 0.8s ease-out;
-    filter: drop-shadow(var(--win-glow));
-}
-
-@keyframes symbol-win {
-    0%, 100% { transform: scale(1); }
-    50% { transform: scale(1.2); }
-}
-
-.spinner {
-    width: var(--spinner-size);
-    height: var(--spinner-size);
-    border: 3px solid rgba(0, 243, 255, 0.3);
-    border-top-color: var(--neon-primary);
-    border-radius: 50%;
-    animation: spin 1s linear infinite;
-}
+body { font-family: Arial, sans-serif; background-color: #121212; color: #ffffff; text-align: center; margin: 0; padding: 20px; overflow: hidden; }
+.container { max-width: 800px; margin: 0 auto; background-color: #1e1e1e; border-radius: 15px; padding: 30px; box-shadow: 0 0 30px rgba(0, 0, 0, 0.7); border: 2px solid #ff9800; }
+h1 { color: #ff9800; font-size: 36px; margin-bottom: 30px; text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5); }
+.slot-machine { display: grid; grid-template-columns: repeat(5, 100px); grid-template-rows: repeat(3, 100px); gap: 15px; justify-content: center; margin: 20px 0; perspective: 1000px; }
+.reel { width: 100px; height: 100px; background-color: #222; border-radius: 10px; display: flex; justify-content: center; align-items: center; font-size: 50px; box-shadow: inset 0 0 15px rgba(0, 0, 0, 0.8), 0 0 20px rgba(255, 152, 0, 0.5); transition: transform 0.3s; transform-style: preserve-3d; }
+.reel:hover { transform: scale(1.1); }
+#spin-btn { background-color: #ff9800; color: white; border: none; padding: 15px 40px; font-size: 20px; border-radius: 10px; cursor: pointer; margin: 20px 0; transition: background-color 0.3s, transform 0.3s; box-shadow: 0 0 20px rgba(255, 152, 0, 0.5); }
+#spin-btn:hover { background-color: #f57c00; transform: scale(1.05); }
+#spin-btn:disabled { background-color: #666; cursor: not-allowed; box-shadow: none; }
+.tokens { font-size: 28px; margin: 20px 0; color: #ffeb3b; text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5); }
+.result { font-size: 24px; height: 30px; margin: 20px 0; color: #4caf50; text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5); }
+.symbols { margin-top: 30px; font-size: 16px; color: #aaa; text-align: left; }
+.bonus-info { font-size: 20px; color: #ffeb3b; margin-top: 20px; text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5); }
+@keyframes spin { 0% { transform: rotateX(0deg); } 100% { transform: rotateX(360deg); } }
+@keyframes shine { 0% { opacity: 0; } 50% { opacity: 1; } 100% { opacity: 0; } }
+.reel.spinning { animation: spin 1s infinite linear; }
+.reel.winning { animation: shine 1s infinite; }
+.multiplier { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 36px; color: #ffeb3b; text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5); animation: shine 1s infinite; }
