@@ -5,8 +5,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Cope Tokens Slot Machine</title>
     <style>
+        :root {
+            --wild-color: #9b59b6;
+            --bonus-color: #2ecc71;
+        }
+
         body {
-            font-family: Arial, sans-serif;
+            font-family: 'Arial Black', Gadget, sans-serif;
             background-color: #121212;
             color: #ffffff;
             text-align: center;
@@ -15,24 +20,27 @@
         }
         
         .container {
-            max-width: 600px;
+            max-width: 800px;
             margin: 0 auto;
             background-color: #1e1e1e;
             border-radius: 10px;
             padding: 20px;
             box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+            position: relative;
+            overflow: hidden;
         }
         
         h1 {
             color: #ff9800;
             margin-bottom: 30px;
+            text-shadow: 0 0 10px rgba(255, 152, 0, 0.5);
         }
         
-        .slot-machine {
-            display: flex;
-            justify-content: center;
-            margin: 20px 0;
+        .slot-grid {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
             gap: 10px;
+            margin: 20px 0;
         }
         
         .reel {
@@ -45,6 +53,23 @@
             align-items: center;
             font-size: 40px;
             box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.8);
+            transition: transform 0.1s;
+        }
+
+        .reel.wild {
+            animation: wildPulse 1s infinite;
+            background-color: var(--wild-color);
+        }
+
+        .bonus-active {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: radial-gradient(circle, transparent 50%, rgba(46, 204, 113, 0.2));
+            pointer-events: none;
+            animation: bonusGlow 2s infinite;
         }
         
         #spin-btn {
@@ -56,11 +81,14 @@
             border-radius: 5px;
             cursor: pointer;
             margin: 20px 0;
-            transition: background-color 0.3s;
+            transition: all 0.3s;
+            position: relative;
         }
-        
-        #spin-btn:hover {
-            background-color: #f57c00;
+
+        #daily-btn {
+            background-color: #3498db;
+            margin-left: 10px;
+            padding: 8px 15px;
         }
         
         #spin-btn:disabled {
@@ -68,192 +96,157 @@
             cursor: not-allowed;
         }
         
-        .tokens {
-            font-size: 24px;
+        .currency-panel {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
             margin: 20px 0;
+            padding: 15px;
+            background: #2c2c2c;
+            border-radius: 8px;
         }
-        
-        .result {
-            font-size: 20px;
-            height: 30px;
-            margin: 20px 0;
-            color: #4caf50;
+
+        .bonus-display {
+            color: var(--bonus-color);
+            font-size: 18px;
         }
-        
-        .symbols {
-            margin-top: 30px;
-            font-size: 14px;
-            color: #aaa;
-            text-align: left;
+
+        @keyframes wildPulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+
+        @keyframes bonusGlow {
+            0% { opacity: 0.5; }
+            50% { opacity: 0.8; }
+            100% { opacity: 0.5; }
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>Cope Tokens Slot Machine</h1>
+        <h1>🍇 Wild Grape Cope Tokens Slot 🎰</h1>
         
-        <div class="tokens">Tokens: <span id="token-count">1000</span></div>
+        <div class="currency-panel">
+            <div class="tokens">
+                🪙 Cope Tokens: <span id="token-count">1000</span>
+                <button id="daily-btn" onclick="claimDaily()">DAILY (333🪙)</button>
+                <div id="daily-timer"></div>
+            </div>
+            <div class="bonus-display">
+                🍇 Free Spins: <span id="free-spins">0</span><br>
+                Multiplier: <span id="multiplier">1x</span>
+            </div>
+        </div>
         
-        <div class="slot-machine">
+        <div class="slot-grid">
             <div class="reel" id="reel1">?</div>
             <div class="reel" id="reel2">?</div>
             <div class="reel" id="reel3">?</div>
+            <div class="reel" id="reel4">?</div>
+            <div class="reel" id="reel5">?</div>
         </div>
         
-        <button id="spin-btn">SPIN (10 tokens)</button>
+        <button id="spin-btn" onclick="startSpin()">SPIN (10🪙)</button>
         
         <div class="result" id="result-text"></div>
-        
-        <div class="symbols">
-            <p><strong>Winning Combinations:</strong></p>
-            <p>🍒 🍒 🍒 = 50 tokens</p>
-            <p>🍋 🍋 🍋 = 100 tokens</p>
-            <p>🔔 🔔 🔔 = 150 tokens</p>
-            <p>💎 💎 💎 = 300 tokens</p>
-            <p>7️⃣ 7️⃣ 7️⃣ = 500 tokens</p>
-            <p>Any two matching symbols = 5 tokens</p>
-        </div>
     </div>
-    
+
     <script>
-        // Elements
-        const reels = [
-            document.getElementById('reel1'),
-            document.getElementById('reel2'),
-            document.getElementById('reel3')
-        ];
-        const spinButton = document.getElementById('spin-btn');
-        const tokenCountElement = document.getElementById('token-count');
-        const resultTextElement = document.getElementById('result-text');
-        
-        // Game variables
-        let tokens = 1000;
-        const spinCost = 10;
-        let isSpinning = false;
-        
-        // Symbols with their probabilities and values
+        // Game state
+        let state = {
+            tokens: localStorage.getItem('copeTokens') ? parseInt(localStorage.getItem('copeTokens')) : 1000,
+            lastDaily: localStorage.getItem('lastDaily') || 0,
+            freeSpins: 0,
+            multiplier: 1,
+            wildCount: 0
+        };
+
+        // Symbol configuration
         const symbols = [
-            { symbol: '🍒', value: 50, probability: 30 },
-            { symbol: '🍋', value: 100, probability: 20 },
-            { symbol: '🔔', value: 150, probability: 15 },
-            { symbol: '💎', value: 300, probability: 10 },
-            { symbol: '7️⃣', value: 500, probability: 5 },
-            { symbol: '❓', value: 0, probability: 20 }
+            { symbol: '🍒', value: 30, prob: 40 },
+            { symbol: '🍋', value: 50, prob: 30 },
+            { symbol: '🔔', value: 80, prob: 15 },
+            { symbol: '💎', value: 150, prob: 8 },
+            { symbol: '7️⃣', value: 300, prob: 4 },
+            { symbol: '🍇', value: 'WILD', prob: 3 }
         ];
-        
-        // Initialize
-        updateTokenDisplay();
-        
-        // Spin button click event
-        spinButton.addEventListener('click', () => {
-            if (isSpinning) return;
-            
-            if (tokens < spinCost) {
-                resultTextElement.textContent = "Not enough tokens!";
-                resultTextElement.style.color = "#ff5252";
+
+        // Initialize game
+        function init() {
+            updateDisplay();
+            setInterval(updateDailyTimer, 1000);
+        }
+
+        // Spin mechanics
+        function startSpin() {
+            if (state.tokens < 10 && state.freeSpins === 0) {
+                showResult("Not enough cope tokens!", '#ff5252');
                 return;
             }
-            
-            // Deduct tokens
-            tokens -= spinCost;
-            updateTokenDisplay();
-            
-            // Start spinning
-            isSpinning = true;
-            spinButton.disabled = true;
-            resultTextElement.textContent = "";
-            
-            // Animate reels
-            spinReels();
-        });
-        
-        function spinReels() {
-            // Generate final results first
-            const results = [
-                getRandomSymbol(),
-                getRandomSymbol(),
-                getRandomSymbol()
-            ];
-            
-            // Animation variables
-            const spinDuration = 2000; // 2 seconds
-            const startTime = Date.now();
-            
-            // Animation function
-            function animate() {
-                const elapsed = Date.now() - startTime;
-                const progress = Math.min(elapsed / spinDuration, 1);
-                
-                // Update reels with random symbols during animation
-                for (let i = 0; i < reels.length; i++) {
-                    // Stop reels one by one
-                    if (progress < 0.7 + (i * 0.1)) {
-                        reels[i].textContent = symbols[Math.floor(Math.random() * symbols.length)].symbol;
-                    } else {
-                        // Show final result
-                        reels[i].textContent = results[i].symbol;
-                    }
-                }
-                
-                // Continue animation or end
-                if (progress < 1) {
-                    requestAnimationFrame(animate);
-                } else {
-                    // Animation complete, check for wins
-                    checkWin(results);
-                    isSpinning = false;
-                    spinButton.disabled = false;
-                }
+
+            if (state.freeSpins === 0) {
+                state.tokens -= 10;
+            } else {
+                state.freeSpins--;
             }
-            
-            // Start animation
-            animate();
+
+            const results = Array(5).fill().map(getWeightedSymbol);
+            animateSpin(results);
+            checkWildBonus(results);
+            updateStorage();
+            updateDisplay();
         }
-        
-        function getRandomSymbol() {
-            // Create array based on probabilities
-            const probabilityArray = [];
+
+        // Bonus system
+        function checkWildBonus(results) {
+            const wilds = results.filter(s => s.symbol === '🍇').length;
+            state.wildCount += wilds;
             
-            for (const item of symbols) {
-                for (let i = 0; i < item.probability; i++) {
-                    probabilityArray.push(item);
-                }
+            if (state.wildCount >= 3) {
+                state.freeSpins += 10;
+                state.multiplier = 2;
+                state.wildCount -= 3;
+                showResult(`BONUS ACTIVATED! 10 FREE SPINS @ 2x!`, '#2ecc71');
+                document.querySelector('.container').classList.add('bonus-active');
+                setTimeout(() => {
+                    document.querySelector('.container').classList.remove('bonus-active');
+                }, 3000);
             }
-            
-            // Return random symbol
-            return probabilityArray[Math.floor(Math.random() * probabilityArray.length)];
         }
-        
-        function checkWin(results) {
-            // Check for three matching symbols
-            if (results[0].symbol === results[1].symbol && results[1].symbol === results[2].symbol) {
-                const winAmount = results[0].value;
-                tokens += winAmount;
-                updateTokenDisplay();
-                resultTextElement.textContent = `Winner! +${winAmount} tokens`;
-                resultTextElement.style.color = "#4caf50";
-                return;
-            }
-            
-            // Check for two matching symbols
-            if (results[0].symbol === results[1].symbol || 
-                results[1].symbol === results[2].symbol || 
-                results[0].symbol === results[2].symbol) {
-                tokens += 5;
-                updateTokenDisplay();
-                resultTextElement.textContent = "Two matches! +5 tokens";
-                resultTextElement.style.color = "#2196f3";
-                return;
-            }
-            
-            // No win
-            resultTextElement.textContent = "Try again!";
-            resultTextElement.style.color = "#ff9800";
+
+        // Daily reward system
+        function claimDaily() {
+            const now = Date.now();
+            const last = parseInt(state.lastDaily);
+            if (now - last < 86400000) return;
+
+            state.tokens += 333;
+            state.lastDaily = now;
+            updateStorage();
+            updateDisplay();
         }
-        
-        function updateTokenDisplay() {
-            tokenCountElement.textContent = tokens;
+
+        // Helper functions
+        function getWeightedSymbol() {
+            const pool = symbols.flatMap(s => Array(s.prob).fill(s));
+            return pool[Math.floor(Math.random() * pool.length)];
         }
+
+        function updateDisplay() {
+            document.getElementById('token-count').textContent = state.tokens;
+            document.getElementById('free-spins').textContent = state.freeSpins;
+            document.getElementById('multiplier').textContent = `${state.multiplier}x`;
+        }
+
+        function updateStorage() {
+            localStorage.setItem('copeTokens', state.tokens);
+            localStorage.setItem('lastDaily', state.lastDaily);
+        }
+
+        // Initialization
+        init();
     </script>
 </body>
 </html>
