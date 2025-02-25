@@ -3,46 +3,257 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Neon Vortex Pro | Modern Slot Machine</title>
-    <link rel="stylesheet" href="styles.css">
+    <title>Cope Tokens Slot Machine</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #121212;
+            color: #ffffff;
+            text-align: center;
+            margin: 0;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background-color: #1e1e1e;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+        }
+        
+        h1 {
+            color: #ff9800;
+            margin-bottom: 30px;
+        }
+        
+        .slot-machine {
+            display: flex;
+            justify-content: center;
+            margin: 20px 0;
+            gap: 10px;
+        }
+        
+        .reel {
+            width: 80px;
+            height: 120px;
+            background-color: #333;
+            border-radius: 5px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 40px;
+            box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.8);
+        }
+        
+        #spin-btn {
+            background-color: #ff9800;
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            font-size: 18px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 20px 0;
+            transition: background-color 0.3s;
+        }
+        
+        #spin-btn:hover {
+            background-color: #f57c00;
+        }
+        
+        #spin-btn:disabled {
+            background-color: #666;
+            cursor: not-allowed;
+        }
+        
+        .tokens {
+            font-size: 24px;
+            margin: 20px 0;
+        }
+        
+        .result {
+            font-size: 20px;
+            height: 30px;
+            margin: 20px 0;
+            color: #4caf50;
+        }
+        
+        .symbols {
+            margin-top: 30px;
+            font-size: 14px;
+            color: #aaa;
+            text-align: left;
+        }
+    </style>
 </head>
 <body>
-    <div class="slot-machine">
-        <div class="header">
-            <div class="meter">
-                <span class="label">CREDIT</span>
-                <span id="credit" class="value">10,000</span>
-            </div>
-            <div class="meter">
-                <span class="label">BET</span>
-                <div class="bet-controls">
-                    <button id="half" class="bet-mod">½</button>
-                    <span id="bet" class="value">100</span>
-                    <button id="double" class="bet-mod">2×</button>
-                </div>
-            </div>
-            <div class="meter">
-                <span class="label">WIN</span>
-                <span id="win" class="value">0</span>
-            </div>
+    <div class="container">
+        <h1>Cope Tokens Slot Machine</h1>
+        
+        <div class="tokens">Tokens: <span id="token-count">1000</span></div>
+        
+        <div class="slot-machine">
+            <div class="reel" id="reel1">?</div>
+            <div class="reel" id="reel2">?</div>
+            <div class="reel" id="reel3">?</div>
         </div>
-
-        <div class="reel-container">
-            <div class="reel-mask">
-                <div class="reels">
-                    <!-- Generated dynamically -->
-                </div>
-            </div>
-        </div>
-
-        <div class="control-panel">
-            <button id="spin" class="spin-button">
-                <div class="spinner"></div>
-                SPIN
-            </button>
+        
+        <button id="spin-btn">SPIN (10 tokens)</button>
+        
+        <div class="result" id="result-text"></div>
+        
+        <div class="symbols">
+            <p><strong>Winning Combinations:</strong></p>
+            <p>🍒 🍒 🍒 = 50 tokens</p>
+            <p>🍋 🍋 🍋 = 100 tokens</p>
+            <p>🔔 🔔 🔔 = 150 tokens</p>
+            <p>💎 💎 💎 = 300 tokens</p>
+            <p>7️⃣ 7️⃣ 7️⃣ = 500 tokens</p>
+            <p>Any two matching symbols = 5 tokens</p>
         </div>
     </div>
-
-    <script src="scripts.js"></script>
+    
+    <script>
+        // Elements
+        const reels = [
+            document.getElementById('reel1'),
+            document.getElementById('reel2'),
+            document.getElementById('reel3')
+        ];
+        const spinButton = document.getElementById('spin-btn');
+        const tokenCountElement = document.getElementById('token-count');
+        const resultTextElement = document.getElementById('result-text');
+        
+        // Game variables
+        let tokens = 1000;
+        const spinCost = 10;
+        let isSpinning = false;
+        
+        // Symbols with their probabilities and values
+        const symbols = [
+            { symbol: '🍒', value: 50, probability: 30 },
+            { symbol: '🍋', value: 100, probability: 20 },
+            { symbol: '🔔', value: 150, probability: 15 },
+            { symbol: '💎', value: 300, probability: 10 },
+            { symbol: '7️⃣', value: 500, probability: 5 },
+            { symbol: '❓', value: 0, probability: 20 }
+        ];
+        
+        // Initialize
+        updateTokenDisplay();
+        
+        // Spin button click event
+        spinButton.addEventListener('click', () => {
+            if (isSpinning) return;
+            
+            if (tokens < spinCost) {
+                resultTextElement.textContent = "Not enough tokens!";
+                resultTextElement.style.color = "#ff5252";
+                return;
+            }
+            
+            // Deduct tokens
+            tokens -= spinCost;
+            updateTokenDisplay();
+            
+            // Start spinning
+            isSpinning = true;
+            spinButton.disabled = true;
+            resultTextElement.textContent = "";
+            
+            // Animate reels
+            spinReels();
+        });
+        
+        function spinReels() {
+            // Generate final results first
+            const results = [
+                getRandomSymbol(),
+                getRandomSymbol(),
+                getRandomSymbol()
+            ];
+            
+            // Animation variables
+            const spinDuration = 2000; // 2 seconds
+            const startTime = Date.now();
+            
+            // Animation function
+            function animate() {
+                const elapsed = Date.now() - startTime;
+                const progress = Math.min(elapsed / spinDuration, 1);
+                
+                // Update reels with random symbols during animation
+                for (let i = 0; i < reels.length; i++) {
+                    // Stop reels one by one
+                    if (progress < 0.7 + (i * 0.1)) {
+                        reels[i].textContent = symbols[Math.floor(Math.random() * symbols.length)].symbol;
+                    } else {
+                        // Show final result
+                        reels[i].textContent = results[i].symbol;
+                    }
+                }
+                
+                // Continue animation or end
+                if (progress < 1) {
+                    requestAnimationFrame(animate);
+                } else {
+                    // Animation complete, check for wins
+                    checkWin(results);
+                    isSpinning = false;
+                    spinButton.disabled = false;
+                }
+            }
+            
+            // Start animation
+            animate();
+        }
+        
+        function getRandomSymbol() {
+            // Create array based on probabilities
+            const probabilityArray = [];
+            
+            for (const item of symbols) {
+                for (let i = 0; i < item.probability; i++) {
+                    probabilityArray.push(item);
+                }
+            }
+            
+            // Return random symbol
+            return probabilityArray[Math.floor(Math.random() * probabilityArray.length)];
+        }
+        
+        function checkWin(results) {
+            // Check for three matching symbols
+            if (results[0].symbol === results[1].symbol && results[1].symbol === results[2].symbol) {
+                const winAmount = results[0].value;
+                tokens += winAmount;
+                updateTokenDisplay();
+                resultTextElement.textContent = `Winner! +${winAmount} tokens`;
+                resultTextElement.style.color = "#4caf50";
+                return;
+            }
+            
+            // Check for two matching symbols
+            if (results[0].symbol === results[1].symbol || 
+                results[1].symbol === results[2].symbol || 
+                results[0].symbol === results[2].symbol) {
+                tokens += 5;
+                updateTokenDisplay();
+                resultTextElement.textContent = "Two matches! +5 tokens";
+                resultTextElement.style.color = "#2196f3";
+                return;
+            }
+            
+            // No win
+            resultTextElement.textContent = "Try again!";
+            resultTextElement.style.color = "#ff9800";
+        }
+        
+        function updateTokenDisplay() {
+            tokenCountElement.textContent = tokens;
+        }
+    </script>
 </body>
 </html>
