@@ -494,3 +494,384 @@ async function spin() {
     }
     
     //
+// Set win amount
+winAmount.textContent = `+${amount}`;
+    
+// Set win text based on amount
+if (amount >= 500) {
+    winText.textContent = 'BIG WIN';
+    winText.classList.add('big-win-pulse');
+} else if (amount >= 200) {
+    winText.textContent = 'GREAT WIN';
+    winText.classList.add('big-win-pulse');
+} else {
+    winText.textContent = 'WIN';
+    winText.classList.remove('big-win-pulse');
+}
+
+// Show overlay
+winOverlay.classList.add('active');
+
+// Hide after delay
+setTimeout(() => {
+    winOverlay.classList.remove('active');
+    winText.classList.remove('big-win-pulse');
+}, 2000);
+}
+
+// Show bonus activation animation
+function showBonusAnimation() {
+    const bonusOverlay = document.querySelector('.bonus-overlay');
+    const bonusTitle = document.querySelector('.bonus-title');
+    const bonusSubtitle = document.querySelector('.bonus-subtitle');
+    const bonusMultiplier = document.querySelector('.bonus-multiplier');
+    
+    // Add activation class
+    bonusTitle.classList.add('bonus-activation');
+    bonusSubtitle.classList.add('bonus-activation');
+    bonusMultiplier.classList.add('bonus-activation');
+    
+    // Show overlay
+    bonusOverlay.classList.add('active');
+    
+    // Hide after delay
+    setTimeout(() => {
+        bonusOverlay.classList.remove('active');
+        bonusTitle.classList.remove('bonus-activation');
+        bonusSubtitle.classList.remove('bonus-activation');
+        bonusMultiplier.classList.remove('bonus-activation');
+    }, 3000);
+}
+
+// Export animation functions
+window.Animations = {
+    showWinAnimation,
+    showBonusAnimation
+};
+
+// Bonus feature management
+let bonusSymbolsCollected = 0;
+let bonusSpinsRemaining = 0;
+let isBonusActive = false;
+
+// Initialize bonus display
+function initBonus() {
+    updateBonusDisplay();
+}
+
+// Update the bonus display
+function updateBonusDisplay() {
+    const bonusBar = document.querySelector('.bonus-bar');
+    const bonusCount = document.querySelector('.bonus-count');
+    
+    // Update progress bar
+    const progressPercentage = (bonusSymbolsCollected / 3) * 100;
+    bonusBar.style.width = `${progressPercentage}%`;
+    
+    // Update count
+    bonusCount.textContent = `${bonusSymbolsCollected}/3`;
+}
+
+// Add bonus symbols
+function addBonusSymbols(count) {
+    bonusSymbolsCollected += count;
+    
+    // Check if bonus should activate
+    if (bonusSymbolsCollected >= 3 && !isBonusActive) {
+        activateBonus();
+    } else {
+        updateBonusDisplay();
+    }
+}
+
+// Activate bonus feature
+function activateBonus() {
+    isBonusActive = true;
+    bonusSpinsRemaining = 10;
+    bonusSymbolsCollected = 0;
+    
+    // Set bonus multiplier
+    Multiplier.setBonusMultiplier(3);
+    
+    // Update display
+    updateBonusDisplay();
+    
+    // Show bonus animation
+    Animations.showBonusAnimation();
+}
+
+// Process a bonus spin
+function processBonusSpin() {
+    bonusSpinsRemaining--;
+    
+    // Check if bonus is over
+    if (bonusSpinsRemaining <= 0) {
+        endBonus();
+    }
+}
+
+// End bonus feature
+function endBonus() {
+    isBonusActive = false;
+    bonusSpinsRemaining = 0;
+    
+    // Reset bonus multiplier
+    Multiplier.resetBonusMultiplier();
+    
+    // Update display
+    updateBonusDisplay();
+}
+
+// Check if bonus is active
+function isInBonus() {
+    return isBonusActive;
+}
+
+// Get remaining bonus spins
+function getRemainingBonusSpins() {
+    return bonusSpinsRemaining;
+}
+
+// Export bonus functions
+window.Bonus = {
+    initBonus,
+    addBonusSymbols,
+    processBonusSpin,
+    isInBonus,
+    getRemainingBonusSpins
+};
+
+// Main game logic
+let balance = 1000;
+let currentBet = 50;
+let isSpinning = false;
+let autoSpinActive = false;
+let autoSpinCount = 0;
+
+// Initialize the game
+function initGame() {
+    // Initialize UI elements
+    updateBalanceDisplay();
+    updateBetDisplay();
+    
+    // Initialize grid
+    Grid.initializeGrid();
+    
+    // Initialize multiplier
+    Multiplier.initMultiplier();
+    
+    // Initialize bonus
+    Bonus.initBonus();
+    
+    // Set up event listeners
+    setupEventListeners();
+}
+
+// Set up event listeners
+function setupEventListeners() {
+    // Spin button
+    document.getElementById('spin-button').addEventListener('click', () => {
+        if (!isSpinning) {
+            spin();
+        }
+    });
+    
+    // Bet controls
+    document.getElementById('increase-bet').addEventListener('click', () => {
+        if (!isSpinning) {
+            increaseBet();
+        }
+    });
+    
+    document.getElementById('decrease-bet').addEventListener('click', () => {
+        if (!isSpinning) {
+            decreaseBet();
+        }
+    });
+    
+    // Max bet button
+    document.getElementById('max-bet').addEventListener('click', () => {
+        if (!isSpinning) {
+            setMaxBet();
+        }
+    });
+    
+    // Auto spin button
+    document.getElementById('auto-spin').addEventListener('click', () => {
+        toggleAutoSpin();
+    });
+    
+    // Info button
+    document.getElementById('info-button').addEventListener('click', () => {
+        toggleInfoPanel();
+    });
+    
+    // Close info button
+    document.getElementById('close-info').addEventListener('click', () => {
+        toggleInfoPanel();
+    });
+    
+    // Keyboard shortcuts
+    document.addEventListener('keydown', (e) => {
+        if (e.code === 'Space' && !isSpinning) {
+            spin();
+            e.preventDefault();
+        }
+    });
+}
+
+// Spin the reels
+async function spin() {
+    if (isSpinning) return;
+    
+    // Check if we have enough balance
+    if (balance < currentBet && !Bonus.isInBonus()) {
+        // Not enough balance
+        return;
+    }
+    
+    isSpinning = true;
+    
+    // Update balance
+    if (!Bonus.isInBonus()) {
+        balance -= currentBet;
+        updateBalanceDisplay();
+    } else {
+        // Process bonus spin
+        Bonus.processBonusSpin();
+    }
+    
+    // Disable spin button
+    toggleSpinButton(false);
+    
+    // Clear previous highlights
+    Grid.clearHighlights();
+    
+    // Spin the grid
+    const newGrid = await Grid.spinGrid(Bonus.isInBonus());
+    
+    // Check for wins
+    const { winningCells, bonusCells, totalWin } = Grid.checkWins(newGrid);
+    
+    // Process bonus symbols
+    if (bonusCells.length > 0 && !Bonus.isInBonus()) {
+        Bonus.addBonusSymbols(bonusCells.length);
+        Grid.highlightWinningCells(bonusCells, true);
+    }
+    
+    // Process win
+    if (winningCells.length > 0) {
+        // Calculate final win with multiplier
+        const multiplier = Multiplier.getCurrentMultiplier();
+        const finalWin = Math.floor(totalWin * multiplier);
+        
+        // Update balance
+        balance += finalWin;
+        updateBalanceDisplay();
+        
+        // Highlight winning cells
+        Grid.highlightWinningCells(winningCells);
+        
+        // Show win animation
+        Animations.showWinAnimation(finalWin);
+        
+        // Increase multiplier
+        Multiplier.increaseMultiplier();
+    } else {
+        // Reset multiplier on loss (if not in bonus)
+        if (!Bonus.isInBonus()) {
+            Multiplier.resetMultiplier();
+        }
+    }
+    
+    // Re-enable spin button
+    isSpinning = false;
+    toggleSpinButton(true);
+    
+    // Continue auto spin if active
+    if (autoSpinActive) {
+        autoSpinCount--;
+        
+        if (autoSpinCount > 0) {
+            setTimeout(spin, 1000);
+        } else {
+            autoSpinActive = false;
+        }
+    }
+}
+
+// Increase bet
+function increaseBet() {
+    if (currentBet < 500) {
+        currentBet += 10;
+        updateBetDisplay();
+    }
+}
+
+// Decrease bet
+function decreaseBet() {
+    if (currentBet > 10) {
+        currentBet -= 10;
+        updateBetDisplay();
+    }
+}
+
+// Set max bet
+function setMaxBet() {
+    currentBet = 500;
+    updateBetDisplay();
+}
+
+// Toggle auto spin
+function toggleAutoSpin() {
+    if (autoSpinActive) {
+        autoSpinActive = false;
+        autoSpinCount = 0;
+    } else {
+        autoSpinActive = true;
+        autoSpinCount = 10;
+        
+        if (!isSpinning) {
+            spin();
+        }
+    }
+}
+
+// Toggle info panel
+function toggleInfoPanel() {
+    const infoPanel = document.querySelector('.info-panel');
+    infoPanel.classList.toggle('active');
+}
+
+// Update balance display
+function updateBalanceDisplay() {
+    document.querySelector('.balance-value').textContent = Utils.formatCurrency(balance);
+}
+
+// Update bet display
+function updateBetDisplay() {
+    document.getElementById('bet-amount').textContent = currentBet;
+}
+
+// Toggle spin button
+function toggleSpinButton(enabled) {
+    const spinButton = document.getElementById('spin-button');
+    
+    if (enabled) {
+        spinButton.classList.remove('disabled');
+        spinButton.disabled = false;
+    } else {
+        spinButton.classList.add('disabled');
+        spinButton.disabled = true;
+    }
+}
+
+// Export game functions
+window.Game = {
+    initGame
+};
+
+// Initialize the game when the DOM is loaded
+document.addEventListener('DOMContentLoaded', () => {
+    Game.initGame();
+});
