@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Responsive Slot Machine</title>
+    <title>Slot Machine</title>
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
@@ -11,31 +11,75 @@
         <!-- Header -->
         <div class="header">
             <div class="bet-controls">
-                <label for="bet-amount">Bet Amount:</label>
-                <input type="number" id="bet-amount" value="10" min="1">
-                <button id="half-bet">½</button>
-                <button id="double-bet">2×</button>
+                <div class="toggle-buttons">
+                    <button id="manual-btn" class="active">Manual</button>
+                    <button id="auto-btn">Auto</button>
+                </div>
+                <div class="bet-amount">
+                    <label for="bet-input">Bet Amount:</label>
+                    <input type="number" id="bet-input" value="0.00" min="0.01" step="0.01">
+                    <button id="half-bet">½</button>
+                    <button id="double-bet">2×</button>
+                </div>
+                <div class="lines-control">
+                    <label for="lines-select">Lines:</label>
+                    <select id="lines-select">
+                        <option value="5">5</option>
+                        <option value="10">10</option>
+                        <option value="15">15</option>
+                        <option value="20" selected>20</option>
+                    </select>
+                </div>
+                <div class="bet-per-line">
+                    Bet Per Line: $<span id="bet-per-line">0.00</span>
+                </div>
             </div>
+
+            <!-- Spin Button -->
+            <button id="spin-btn" class="spin-btn">Bet</button>
+
+            <!-- Balance -->
             <div class="balance-display">
-                Balance: $<span id="balance">1000</span>
+                Balance: $<span id="balance">1000.00</span>
+            </div>
+
+            <!-- Total Payout -->
+            <div class="total-payout">
+                Total Payout: $<span id="payout">0.00</span>
             </div>
         </div>
 
         <!-- Slot Machine -->
         <div class="slot-machine">
-            <div class="reel-container" id="reel-1"></div>
-            <div class="reel-container" id="reel-2"></div>
-            <div class="reel-container" id="reel-3"></div>
+            <!-- Payline Numbers (Left) -->
+            <div class="payline-numbers left">
+                <span>4</span><span>10</span><span>2</span><span>6</span><span>12</span><span>1</span><span>8</span><span>7</span><span>3</span><span>11</span><span>5</span>
+            </div>
+
+            <!-- Reels -->
+            <div class="reels-container">
+                <!-- Reel 1 -->
+                <div class="reel"></div>
+                <!-- Reel 2 -->
+                <div class="reel"></div>
+                <!-- Reel 3 -->
+                <div class="reel"></div>
+                <!-- Reel 4 -->
+                <div class="reel"></div>
+                <!-- Reel 5 -->
+                <div class="reel"></div>
+            </div>
+
+            <!-- Payline Numbers (Right) -->
+            <div class="payline-numbers right">
+                <span>15</span><span>13</span><span>19</span><span>16</span><span>17</span><span>9</span><span>18</span><span>20</span><span>14</span>
+            </div>
         </div>
 
-        <!-- Loading Spinner -->
-        <div class="loading-spinner" id="spinner"></div>
-
-        <!-- Controls -->
-        <div class="controls">
-            <button id="spin-btn">SPIN</button>
-            <p id="result-message"></p>
-        </div>
+        <!-- Footer -->
+        <footer class="footer">
+            Fairness
+        </footer>
     </div>
 
     <!-- JavaScript -->
