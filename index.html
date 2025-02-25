@@ -4,16 +4,18 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Luxury 6x6 Slot Machine</title>
-    <!-- Stylesheets -->
+    <!-- Link to main styles -->
     <link rel="stylesheet" href="styles/main.css">
+    <!-- Link to animations -->
     <link rel="stylesheet" href="styles/animations.css">
+    <!-- Google Fonts -->
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap">
+    <!-- Font Awesome for icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
 <body>
-    <!-- Game Container -->
     <div class="game-container">
-        <!-- Header -->
+        <!-- Header Section -->
         <div class="game-header">
             <div class="logo">DARK FORTUNE</div>
             <div class="multiplier-display">
@@ -35,10 +37,10 @@
             </div>
         </div>
 
-        <!-- Slot Machine -->
+        <!-- Slot Machine Section -->
         <div class="slot-machine">
             <div class="grid-container">
-                <!-- Grid will be dynamically populated -->
+                <!-- Grid will be dynamically populated by JavaScript -->
             </div>
             <!-- Win Overlay -->
             <div class="win-overlay hidden">
@@ -47,37 +49,80 @@
             </div>
             <!-- Bonus Overlay -->
             <div class="bonus-overlay hidden">
-                <h2>FREE SPINS ACTIVATED!</h2>
+                <h2>FREE SPINS ACTIVATED</h2>
                 <p>10 FREE SPINS</p>
-                <p>ALL WINS x3 MULTIPLIER</p>
+                <p>ALL WINS x3</p>
             </div>
         </div>
 
-        <!-- Controls -->
+        <!-- Controls Section -->
         <div class="game-controls">
             <!-- Bet Controls -->
-            <button id="decrease-bet" class="control-btn"><i class="fas fa-minus"></i></button>
-            <span id="bet-amount" class="bet-display">50</span>
-            <button id="increase-bet" class="control-btn"><i class="fas fa-plus"></i></button>
+            <div class="bet-controls">
+                <button id="decrease-bet" class="control-btn"><i class="fas fa-minus"></i></button>
+                <div class="bet-display">
+                    <span>BET:</span> 
+                    <span id="bet-amount">50</span>
+                </div>
+                <button id="increase-bet" class="control-btn"><i class="fas fa-plus"></i></button>
+            </div>
 
-            <!-- Spin Controls -->
+            <!-- Main Controls -->
             <button id="spin-button" class="spin-btn">SPIN</button>
-
-            <!-- Other Controls -->
             <button id="auto-spin" class="control-btn">AUTO</button>
             <button id="max-bet" class="control-btn">MAX BET</button>
+
+            <!-- Info Button -->
+            <button id="info-button" class="control-btn"><i class="fas fa-info-circle"></i></button>
         </div>
 
         <!-- Info Panel -->
         <section id="info-panel" class="hidden">
             <h2>Game Rules</h2>
             <p>Match 3 or more symbols in any direction to win.</p>
-            ...
+
+            <!-- Multiplier Rules -->
+            <h3>Multiplier Rules:</h3>
+            <ul>
+                <li>1st Win: 1x</li>
+                <li>2nd Win: 1.5x</li>
+                <li>3rd Win: 2x</li>
+                <li>4th Win: 3x</li>
+                <li>5th Win: 5x</li>
+                <li>6th+ Win: 8x</li>
+            </ul>
+
+            <!-- Bonus Feature -->
+            <h3>Bonus Feature:</h3>
+            Collect 3 bonus symbols to activate 10 FREE SPINS with a 3x multiplier on all wins!
+
+            <!-- Symbol Values -->
+            <h3>Symbol Values:</h3>
+            (Symbol values will be dynamically populated)
+
+            <!-- Close Info Button -->
+            <button id="close-info" class="close-btn">CLOSE</button>
         </section>
+
     </div>
 
-    <!-- Scripts -->
+    <!-- JavaScript Files -->
+    <!-- Utility Scripts -->
     <script src="./scripts/utils.js"></script>
-    ...
+
+    <!-- Core Game Scripts -->
+    <script src="./scripts/symbols.js"></script>
+    <script src="./scripts/grid.js"></script>
+
+    <!-- Features Scripts (Bonus, Animations, etc.) -->
+    <script src="./scripts/multiplier.js"></script>
+    <script src="./scripts/animations.js"></script>
+
+    <!-- Game Logic and Initialization -->
+    <script src="./scripts/game.js"></script>
+
+    <!-- Main Entry Point -->
+    <script src="./scripts/main.js"></script>
+
 </body>
 </html>
