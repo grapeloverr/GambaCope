@@ -1,86 +1,133 @@
-const gameConfig = {
-    symbols: [
-        { icon: '⚡', weight: 5, multipliers: [0, 2, 5, 10, 25] },
-        { icon: '♦', weight: 15, multipliers: [0, 1, 3, 5, 10] },
-        { icon: '♠', weight: 30, multipliers: [0, 0, 2, 4, 8] },
-        // Add more symbols
-    ],
-    paylines: [
-        [1,1,1,1,1], // Center line
-        [0,0,0,0,0], // Top line
-        [2,2,2,2,2], // Bottom line
-        // Additional paylines
-    ],
-    baseBet: 10
-};
+class SlotMachine {
+    constructor() {
+        this.symbols = [
+            { icon: '⭐', weight: 8, multipliers: [0,2,5,15,50] },
+            { icon: '♦', weight: 15, multipliers: [0,1,4,10,25] },
+            { icon: '♠', weight: 25, multipliers: [0,0,3,8,20] },
+            { icon: '♣', weight: 35, multipliers: [0,0,2,5,15] },
+            { icon: '⚡', weight: 50, multipliers: [0,0,1,3,10] }
+        ];
+        
+        this.state = {
+            credit: 10_000,
+            bet: 100,
+            spinning: false,
+            lastWin: 0
+        };
 
-let gameState = {
-    balance: 1000,
-    currentBet: gameConfig.baseBet,
-    isSpinning: false
-};
+        this.init();
+    }
 
-function spinReels() {
-    if (gameState.isSpinning) return;
-    gameState.isSpinning = true;
-    
-    const reels = Array.from(document.querySelectorAll('.reel'));
-    const spinPromises = reels.map((reel, index) => {
-        return new Promise(resolve => {
-            const symbols = reel.querySelectorAll('.symbol');
-            symbols.forEach(symbol => {
-                const randomSymbol = getWeightedSymbol();
-                symbol.textContent = randomSymbol.icon;
-                symbol.dataset.value = randomSymbol.multipliers;
-            });
-            
-            reel.style.animation = 'reel-spin 3s cubic-bezier(0.4, 0, 0.2, 1)';
-            setTimeout(() => {
-                reel.style.animation = '';
-                resolve();
-            }, 3000 + (index * 150));
+    init() {
+        this.createReels();
+        this.setupControls();
+        this.updateUI();
+    }
+
+    createReels() {
+        const reels = document.querySelector('.reels');
+        for(let i = 0; i < 5; i++) {
+            const reel = document.createElement('div');
+            reel.className = 'reel';
+            for(let j = 0; j < 15; j++) { // Buffer symbols
+                const symbol = document.createElement('div');
+                symbol.className = 'symbol';
+                symbol.textContent = this.getRandomSymbol().icon;
+                reel.appendChild(symbol);
+            }
+            reels.appendChild(reel);
+        }
+    }
+
+    getRandomSymbol() {
+        const totalWeight = this.symbols.reduce((acc, cur) => acc + cur.weight, 0);
+        const random = Math.random() * totalWeight;
+        return this.symbols.find(s => (random -= s.weight) < 0);
+    }
+
+    async spin() {
+        if(this.state.spinning || this.state.credit < this.state.bet) return;
+        
+        this.state.spinning = true;
+        this.state.credit -= this.state.bet;
+        this.updateUI();
+
+        const reels = document.querySelectorAll('.reel');
+        const results = [];
+        
+        // Professional spin animation
+        await Promise.all([...reels].map((reel, i) => 
+            new Promise(resolve => {
+                const duration = 2000 + i * 300;
+                reel.style.transition = `transform ${duration}ms cubic-bezier(0.25, 0.1, 0.25, 1)`;
+                reel.style.transform = `translateY(-200%)`;
+                
+                setTimeout(() => {
+                    reel.style.transition = '';
+                    reel.style.transform = 'translateY(0)';
+                    results.push(this.evaluateReel(reel));
+                    resolve();
+                }, duration);
+            })
+        ));
+
+        this.calculateWin(results);
+        this.state.spinning = false;
+        this.updateUI();
+    }
+
+    evaluateReel(reel) {
+        const symbols = [...reel.children];
+        const middleIndex = Math.floor(symbols.length / 2);
+        return symbols.slice(middleIndex - 1, middleIndex + 2);
+    }
+
+    calculateWin(visibleSymbols) {
+        // Professional payline evaluation
+        const paylines = [
+            [1,1,1,1,1], // Center line
+            [0,0,0,0,0], // Top line
+            [2,2,2,2,2], // Bottom line
+            [0,1,2,1,0], // V pattern
+            [2,1,0,1,2]  // Inverse V
+        ];
+
+        let totalWin = 0;
+        paylines.forEach(line => {
+            const lineSymbols = line.map((row, i) => 
+                visibleSymbols[i][row].textContent);
+                
+            const unique = new Set(lineSymbols);
+            if(unique.size === 1) {
+                const symbol = this.symbols.find(s => s.icon === lineSymbols[0]);
+                totalWin += this.state.bet * symbol.multipliers[4];
+            }
         });
-    });
 
-    Promise.all(spinPromises).then(checkWins);
-}
+        this.state.credit += totalWin;
+        this.state.lastWin = totalWin;
+    }
 
-function getWeightedSymbol() {
-    const totalWeight = gameConfig.symbols.reduce((sum, sym) => sum + sym.weight, 0);
-    let random = Math.random() * totalWeight;
-    
-    for (const symbol of gameConfig.symbols) {
-        if (random < symbol.weight) return symbol;
-        random -= symbol.weight;
+    updateUI() {
+        document.getElementById('credit').textContent = this.state.credit.toLocaleString();
+        document.getElementById('bet').textContent = this.state.bet;
+        document.getElementById('win').textContent = this.state.lastWin.toLocaleString();
+    }
+
+    setupControls() {
+        document.getElementById('spin').addEventListener('click', () => this.spin());
+        
+        document.getElementById('half').addEventListener('click', () => {
+            this.state.bet = Math.max(10, this.state.bet / 2);
+            this.updateUI();
+        });
+
+        document.getElementById('double').addEventListener('click', () => {
+            this.state.bet = Math.min(this.state.credit, this.state.bet * 2);
+            this.updateUI();
+        });
     }
 }
 
-function checkWins() {
-    const visibleSymbols = Array.from(document.querySelectorAll('.symbol'))
-        .map(sym => sym.textContent);
-    
-    let totalWin = 0;
-    gameConfig.paylines.forEach(line => {
-        const lineSymbols = line.map((row, reel) => 
-            visibleSymbols[reel * 3 + row]);
-        
-        const firstSymbol = lineSymbols[0];
-        if (lineSymbols.every(sym => sym === firstSymbol)) {
-            const symbolConfig = gameConfig.symbols.find(s => s.icon === firstSymbol);
-            const multiplier = symbolConfig.multipliers[lineSymbols.length - 1];
-            totalWin += gameState.currentBet * multiplier;
-        }
-    });
-
-    gameState.balance += totalWin;
-    gameState.isSpinning = false;
-    updateUI();
-}
-
-function updateUI() {
-    document.getElementById('balance').textContent = gameState.balance;
-    document.getElementById('current-bet').textContent = gameState.currentBet;
-}
-
-document.getElementById('spin-button').addEventListener('click', spinReels);
-// Add bet adjustment handlers
+// Initialize game
+new SlotMachine();
