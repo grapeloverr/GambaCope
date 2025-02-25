@@ -1,94 +1,87 @@
-/* General Styling */
-body {
-    font-family: Arial, sans-serif;
-    background-color: #0f1624;
-    color: #ffffff;
+/* General Reset */
+* {
     margin: 0;
     padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: Arial, sans-serif;
+    background-color: #0a0f1d;
+    color: #fff;
     display: flex;
     justify-content: center;
     align-items: center;
     height: 100vh;
 }
 
+/* Game Container */
 .game-container {
-    width: 700px;
+    width: 400px;
     background-color: #1a2235;
-    border-radius: 10px;
     padding: 20px;
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
+    border-radius: 10px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
 }
 
-/* Header Section */
-.game-header {
+/* Header */
+.header {
     display: flex;
     justify-content: space-between;
     align-items: center;
+    margin-bottom: 20px;
 }
 
-.bet-controls {
-    display: flex;
-    gap: 20px;
-}
-
-.bet-amount,
-.lines-control {
-    display: flex;
-    flex-direction: column;
-}
-
-input[type='number'],
-select {
+.bet-controls input {
+    width: 60px;
     padding: 5px;
-    font-size: 16px;
-    border-radius: 5px;
-    border: none;
 }
 
-.spin-button {
-    background-color: #00c853;
-    color: #ffffff;
-    font-size: 16px;
-    padding: 10px 20px;
-    border-radius: 5px;
+.bet-controls button {
+    padding: 5px 10px;
+    margin-left: 5px;
+    background-color: #00f3ff;
     border: none;
+    border-radius: 5px;
+    color: #000;
     cursor: pointer;
 }
 
-.spin-button:hover {
-    background-color: #00a843;
-}
-
 .balance-display {
-    font-size: 18px;
+    font-size: 16px;
 }
 
-/* Slot Machine Reels */
+/* Slot Machine */
 .slot-machine {
     display: flex;
     justify-content: space-between;
-    margin-top: 20px;
+    margin-bottom: 20px;
 }
 
-.reel {
-    width: 120px;
-    height: 300px;
-    background-color: #0a0f1d;
-    border-radius: 10px;
+.reel-container {
+    width: 100px;
+    height: 150px;
+    background-color: #0f1624;
+    border-radius: 5px;
     overflow: hidden;
-    display: flex;
-    flex-direction: column-reverse; /* Symbols will "spin" upwards */
 }
 
 .symbol {
     width: 100%;
-    height: 100px; /* Symbol height */
-    display: flex;
-    justify-content: center;
-    align-items: center;
+    height: 50px;
+    text-align: center;
+    line-height: 50px;
 }
 
-/* Footer Section */
-.game-footer {
-    margin-top: 20px;
+/* Loading Spinner */
+.loading-spinner {
+    display: none; /* Initially hidden */
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
 }
+
+.loading-spinner::before {
+    content: '';
+    width: 40px;
