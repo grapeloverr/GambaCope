@@ -3,46 +3,38 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Slot Machine</title>
+    <title>Responsive Slot Machine</title>
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
     <div class="game-container">
-        <!-- Header Section -->
-        <div class="game-header">
+        <!-- Header -->
+        <div class="header">
             <div class="bet-controls">
-                <div class="bet-amount">
-                    <label for="bet-input">Bet Amount:</label>
-                    <input type="number" id="bet-input" value="10" min="1">
-                </div>
-                <div class="lines-control">
-                    <label for="lines-input">Lines:</label>
-                    <select id="lines-input">
-                        <option value="5">5</option>
-                        <option value="10">10</option>
-                        <option value="15">15</option>
-                        <option value="20" selected>20</option>
-                    </select>
-                </div>
-                <button id="spin-btn" class="spin-button">Spin</button>
+                <label for="bet-amount">Bet Amount:</label>
+                <input type="number" id="bet-amount" value="10" min="1">
+                <button id="half-bet">½</button>
+                <button id="double-bet">2×</button>
             </div>
             <div class="balance-display">
                 Balance: $<span id="balance">1000</span>
             </div>
         </div>
 
-        <!-- Slot Machine Reels -->
+        <!-- Slot Machine -->
         <div class="slot-machine">
-            <div class="reel" id="reel-1"></div>
-            <div class="reel" id="reel-2"></div>
-            <div class="reel" id="reel-3"></div>
-            <div class="reel" id="reel-4"></div>
-            <div class="reel" id="reel-5"></div>
+            <div class="reel-container" id="reel-1"></div>
+            <div class="reel-container" id="reel-2"></div>
+            <div class="reel-container" id="reel-3"></div>
         </div>
 
-        <!-- Footer Section -->
-        <div class="game-footer">
-            Total Payout: $<span id="payout">0.00</span>
+        <!-- Loading Spinner -->
+        <div class="loading-spinner" id="spinner"></div>
+
+        <!-- Controls -->
+        <div class="controls">
+            <button id="spin-btn">SPIN</button>
+            <p id="result-message"></p>
         </div>
     </div>
 
