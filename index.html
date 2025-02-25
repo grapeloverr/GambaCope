@@ -7,24 +7,18 @@
     <style>
         body {
             font-family: 'Arial', sans-serif;
-            background: url('https://www.transparenttextures.com/patterns/black-linen-v2.png') repeat;
+            background-color: #121212;
             color: #ffffff;
             text-align: center;
             margin: 0;
             padding: 20px;
-            animation: backgroundAnimation 10s infinite linear;
             overflow: hidden;
-        }
-
-        @keyframes backgroundAnimation {
-            0% { background-position: 0 0; }
-            100% { background-position: 100% 100%; }
         }
 
         .container {
             max-width: 800px;
             margin: 0 auto;
-            background-color: rgba(0, 0, 0, 0.8);
+            background-color: #1e1e1e;
             border-radius: 15px;
             padding: 30px;
             box-shadow: 0 0 30px rgba(0, 0, 0, 0.7);
@@ -425,9 +419,27 @@
             multiplierDisplay.textContent = `Multiplier: x${currentMultiplier}`;
             document.body.appendChild(multiplierDisplay);
 
+            // Update multiplier display during bonus round
+            const updateMultiplier = () => {
+                if (freeSpins > 0) {
+                    currentMultiplier = multipliers[Math.min(Math.floor(Math.random() * multipliers.length), freeSpins - 1)];
+                    multiplierDisplay.textContent = `Multiplier: x${currentMultiplier}`;
+                } else {
+                    document.body.removeChild(multiplierDisplay);
+                }
+            };
+
+            // Update multiplier before each spin in the bonus round
+            const originalSpin = spinReels;
+            spinReels = () => {
+                updateMultiplier();
+                originalSpin();
+            };
+
             // Remove multiplier display after bonus round
             setTimeout(() => {
                 document.body.removeChild(multiplierDisplay);
+                spinReels = originalSpin;
             }, 10000);
         }
 
