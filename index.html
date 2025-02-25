@@ -1,47 +1,42 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Neon Vortex Slots</title>
-    <link rel="stylesheet" href="styles.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Cyberpunk 6x6 Slot Machine</title>
+  <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
-    <div class="slot-container">
-        <div class="game-panel">
-            <div class="info-panel">
-                <div class="multiplier-box">
-                    <span class="label">MULTIPLIER</span>
-                    <span id="multiplier-value" class="value">×1</span>
-                </div>
-                <div class="balance-box">
-                    <span class="label">BALANCE</span>
-                    <span id="balance" class="value">1000</span>
-                </div>
-            </div>
-            
-            <div id="slot-grid" class="slot-grid"></div>
-            
-            <div class="control-panel">
-                <div class="bet-controls">
-                    <button class="bet-btn" onclick="changeBet(-1)">-</button>
-                    <span id="bet-amount" class="bet-amount">10</span>
-                    <button class="bet-btn" onclick="changeBet(1)">+</button>
-                </div>
-                <button id="spin-btn" class="spin-button" onclick="startSpin()">
-                    <span class="spin-text">SPIN</span>
-                    <div class="glow"></div>
-                </button>
-                <label class="auto-spin">
-                    <input type="checkbox" id="auto-spin"> Auto
-                </label>
-            </div>
-        </div>
-    </div>
+  <div class="game-container">
+    <header class="header-panel">
+      <div class="balance">
+        Balance: <span id="balance">1000</span>
+      </div>
+      <div class="bet-controls">
+        <button id="decrease-bet">- Bet</button>
+        <span id="bet-value">10</span>
+        <button id="increase-bet">+ Bet</button>
+      </div>
+      <div class="jackpot">
+        Jackpot: <span id="jackpot">5000</span>
+      </div>
+    </header>
 
-    <audio id="spin-sound" src="https://assets.mixkit.co/active_storage/sfx/2969/2969-preview.mp3"></audio>
-    <audio id="win-sound" src="https://assets.mixkit.co/active_storage/sfx/2965/2965-preview.mp3"></audio>
+    <main class="game-grid">
+      <!-- 6x6 grid cells will be generated dynamically -->
+    </main>
 
-    <script src="scripts.js"></script>
+    <footer class="footer-controls">
+      <button id="spin-btn">Spin</button>
+      <button id="auto-spin-btn">Auto Spin</button>
+    </footer>
+  </div>
+
+  <!-- Audio elements -->
+  <audio id="spin-sound" src="sounds/spin.mp3"></audio>
+  <audio id="win-chime" src="sounds/win.mp3"></audio>
+  <audio id="bg-music" src="sounds/ambient.mp3" loop></audio>
+
+  <script src="game.js"></script>
 </body>
 </html>
