@@ -1,64 +1,37 @@
-:root {
-    --dark-bg: #0f1624;
-    --panel-bg: #1a2235;
-    --neon-accent: #00f3ff;
-    --green-accent: #00c853;
-    --text-primary: rgba(255, 255, 255, 0.9);
-}
-
-body {
-    font-family: Arial, sans-serif;
-    background-color: var(--dark-bg);
-    color: var(--text-primary);
-    margin: 0;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100vh;
-}
-
-.game-container {
-    width: 100%;
-    max-width: 1200px;
-    background-color: var(--panel-bg);
+/* Loading Spinner Styles */
+.spinner-container {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 999999;
+    background: rgba(255, 255, 255, 0.9);
     padding: 20px;
     border-radius: 10px;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
 }
 
-.header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
+.spinner {
+    width: 40px;
+    height: 40px;
+    position: relative;
+    animation: rotate 1s linear infinite;
 }
 
-.bet-controls {
-    display: flex;
-    flex-direction: column;
+@keyframes rotate {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
 }
 
-.bet-amount,
-.lines-control,
-.bet-per-line {
-    margin-bottom: 10px;
+/* Jotform iFrame Styling */
+iframe {
+    border: none;
+    box-shadow: 0 2px 10px rgba(0, 23, 59, 0.1);
 }
 
-input[type='number'],
-select {
-    padding: 5px;
-}
-
-.spin-btn {
-    padding: 10px 20px;
-    background-color: var(--green-accent);
-    color: white;
-}
-
-.slot-machine {
-    display: flex;
-}
-
-.reels-container {
-    display: flex;
-}
-.reel {
+@media (max-width: 768px) {
+    .spinner {
+        width: 30px;
+        height: 30px;
+    }
 }
