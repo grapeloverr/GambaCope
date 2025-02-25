@@ -2,194 +2,172 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>No Limit Enhanced Slot Machine</title>
+  <title>No Limit Megavolt Slot</title>
   <style>
+    :root {
+      --win-glow: radial-gradient(circle, #ffd700 0%, #ff8c00 70%, #ff4500 100%);
+    }
+
     body {
-      background: radial-gradient(circle, #1a1a1a, #000);
-      font-family: Arial, sans-serif;
-      color: #fff;
-      text-align: center;
-      margin: 0;
+      background: #0a0a1a;
+      font-family: 'Arial Black', sans-serif;
+      overflow: hidden;
+    }
+
+    .slot-container {
+      position: relative;
       padding: 20px;
+      perspective: 1000px;
     }
-    h1 {
-      margin-bottom: 20px;
-    }
-    /* Container for the 6x6 grid using CSS Grid */
-    .slot-grid {
+
+    .grid-6x6 {
       display: grid;
-      grid-template-columns: repeat(6, 60px);
-      grid-gap: 5px;
-      justify-content: center;
-      margin-bottom: 20px;
+      grid-template: repeat(6, 1fr) / repeat(6, 1fr);
+      gap: 5px;
+      transform-style: preserve-3d;
     }
-    .slot-cell {
-      width: 60px;
-      height: 60px;
-      font-size: 32px;
+
+    .cell {
+      width: 70px;
+      height: 70px;
+      background: #1a1a2a;
+      border: 2px solid #303045;
+      border-radius: 10px;
       display: flex;
       justify-content: center;
       align-items: center;
-      border: 2px solid #fff;
-      background: #222;
-      border-radius: 10%;
+      font-size: 32px;
+      transition: all 0.3s ease;
+      transform: rotateX(25deg);
+      box-shadow: 0 5px 15px rgba(0,0,0,0.3);
     }
-    /* Simple animation to simulate a spin effect */
-    .spin-animation {
-      animation: spin 0.5s ease;
+
+    .winning-cell {
+      animation: cell-win 1s ease infinite;
+      background: var(--win-glow);
     }
-    @keyframes spin {
-      0% { transform: scale(1) rotate(0deg); }
-      50% { transform: scale(1.1) rotate(15deg); }
-      100% { transform: scale(1) rotate(0deg); }
+
+    @keyframes cell-win {
+      0% { transform: rotateX(25deg) scale(1); }
+      50% { transform: rotateX(25deg) scale(1.1); }
+      100% { transform: rotateX(25deg) scale(1); }
     }
-    .results {
-      margin-top: 20px;
+
+    .meter {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      background: rgba(0,0,0,0.7);
+      padding: 15px;
+      border-radius: 10px;
+      color: #fff;
+      text-shadow: 0 0 10px #00ffff;
     }
-    button {
-      padding: 10px 20px;
-      font-size: 16px;
-      border: none;
-      border-radius: 5px;
-      cursor: pointer;
-      background-color: #ff9900;
-      color: #000;
+
+    #multiplier {
+      color: #ffd700;
+      font-size: 24px;
     }
   </style>
 </head>
 <body>
-  <h1>No Limit Enhanced Slot Machine</h1>
-  
-  <!-- Slot grid (6x6) -->
-  <div class="slot-grid" id="slotGrid"></div>
-  
-  <!-- Score and spin button -->
-  <div class="results">
-    <p>Tokens: <span id="tokenCount">0</span></p>
-    <button id="spinButton">Spin</button>
+  <div class="slot-container">
+    <div class="grid-6x6" id="grid"></div>
+    <div class="meter">
+      Tokens: <span id="tokens">1000</span><br>
+      Multiplier: <span id="multiplier">1x</span>
+    </div>
   </div>
-  
-  <!-- Audio elements for sound effects. Replace "spin.mp3" and "win.mp3" with your own files -->
+
   <audio id="spinSound" src="spin.mp3"></audio>
   <audio id="winSound" src="win.mp3"></audio>
-  
+  <audio id="bonusSound" src="bonus.mp3"></audio>
+
   <script>
-    // Define available symbols; an extra symbol (🍀) was added for variety.
-    const symbols = ["🍒", "🍋", "🔔", "💎", "7️⃣", "🍀"];
-    let tokens = 0;
-    
-    const gridElement = document.getElementById("slotGrid");
-    const tokenDisplay = document.getElementById("tokenCount");
-    const spinButton = document.getElementById("spinButton");
-    const spinSound = document.getElementById("spinSound");
-    const winSound = document.getElementById("winSound");
-    
-    // Create a 6x6 grid (36 cells)
-    const gridCells = [];
-    for (let i = 0; i < 36; i++) {
-      const cell = document.createElement("div");
-      cell.classList.add("slot-cell");
-      // Set each cell to a random symbol initially
-      cell.innerText = symbols[Math.floor(Math.random() * symbols.length)];
-      gridElement.appendChild(cell);
-      gridCells.push(cell);
-    }
-    
-    // Helper function to play a given audio element
-    function playSound(audioElement) {
-      if (audioElement) {
-        audioElement.currentTime = 0;
-        audioElement.play();
-      }
-    }
-    
-    // Spin the slot machine
+    const symbols = ["🍒", "🍋", "🔔", "💎", "7️⃣", "⭐", "☄️", "🎰"];
+    let tokens = 1000;
+    let multiplier = 1;
+    let bonusActive = false;
+
+    // Initialize grid
+    const grid = Array.from({length: 36}, (_, i) => {
+      const cell = document.createElement('div');
+      cell.className = 'cell';
+      cell.textContent = symbols[Math.floor(Math.random() * symbols.length)];
+      document.getElementById('grid').appendChild(cell);
+      return cell;
+    });
+
+    // Enhanced win patterns including diagonals
+    const winPatterns = [
+      // Horizontal lines
+      ...[0,1,2,3].map(y => [y*6, y*6+1, y*6+2, y*6+3, y*6+4, y*6+5]),
+      // Vertical lines
+      ...[0,1,2,3].map(x => [x, x+6, x+12, x+18, x+24, x+30]),
+      // Diagonals
+      [0,7,14,21,28,35], [5,10,15,20,25,30]
+    ];
+
     function spin() {
-      playSound(spinSound); // Play spin sound
+      if(tokens < 50) return alert("Game Over!");
+      tokens -= 50;
+      updateDisplay();
       
-      // Change each cell’s symbol with a quick animation
-      gridCells.forEach(cell => {
-        cell.classList.add("spin-animation");
-        cell.innerText = symbols[Math.floor(Math.random() * symbols.length)];
+      grid.forEach(cell => {
+        cell.classList.remove('winning-cell');
+        cell.style.animation = 'none';
+        setTimeout(() => {
+          cell.textContent = symbols[Math.floor(Math.random() * symbols.length)];
+          cell.style.animation = 'spin 0.8s ease';
+        }, Math.random() * 300);
       });
-      
-      // Remove animation class after it's done and check for wins
-      setTimeout(() => {
-        gridCells.forEach(cell => cell.classList.remove("spin-animation"));
-        checkWin();
-      }, 500);
+
+      setTimeout(checkWins, 1000);
     }
-    
-    // Check for winning combinations horizontally and vertically.
-    // Here, earning tokens is based on getting three or more consecutive same symbols.
-    function checkWin() {
-      let winAmount = 0;
-      
-      // Horizontal win check for each row
-      for (let row = 0; row < 6; row++) {
-        let count = 1;
-        let currentSymbol = gridCells[row * 6].innerText;
-        for (let col = 1; col < 6; col++) {
-          let cellSymbol = gridCells[row * 6 + col].innerText;
-          if (cellSymbol === currentSymbol) {
-            count++;
-          } else {
-            if (count >= 3) { winAmount += getWinAmount(currentSymbol, count); }
-            currentSymbol = cellSymbol;
-            count = 1;
-          }
+
+    function checkWins() {
+      let totalWin = 0;
+      const winningCells = new Set();
+
+      winPatterns.forEach(pattern => {
+        const symbolsInLine = pattern.map(i => grid[i].textContent);
+        if(new Set(symbolsInLine).size === 1) {
+          pattern.forEach(i => winningCells.add(i));
+          totalWin += getSymbolValue(symbolsInLine[0]) * multiplier;
+          activateBonus();
         }
-        if (count >= 3) { winAmount += getWinAmount(currentSymbol, count); }
-      }
-      
-      // Vertical win check for each column
-      for (let col = 0; col < 6; col++) {
-        let count = 1;
-        let currentSymbol = gridCells[col].innerText;
-        for (let row = 1; row < 6; row++) {
-          let cellSymbol = gridCells[row * 6 + col].innerText;
-          if (cellSymbol === currentSymbol) {
-            count++;
-          } else {
-            if (count >= 3) { winAmount += getWinAmount(currentSymbol, count); }
-            currentSymbol = cellSymbol;
-            count = 1;
-          }
-        }
-        if (count >= 3) { winAmount += getWinAmount(currentSymbol, count); }
-      }
-      
-      // If wins occur, update tokens and play a win sound effect
-      if (winAmount > 0) {
-        tokens += winAmount;
-        tokenDisplay.innerText = tokens;
-        playSound(winSound);
+      });
+
+      if(winningCells.size > 0) {
+        winningCells.forEach(i => {
+          grid[i].classList.add('winning-cell');
+          if(Math.random() < 0.3) multiplier++;
+        });
+        tokens += totalWin;
+        updateDisplay();
+        document.getElementById('multiplier').textContent = `${multiplier}x`;
+        playSound(winningCells.size > 6 ? 'bonusSound' : 'winSound');
+      } else {
+        multiplier = 1;
       }
     }
-    
-    // Calculate win amount based on symbol and number of consecutive hits.
-    function getWinAmount(symbol, count) {
-      // Base winnings for exactly three in a row
-      if (count === 3) {
-        if (symbol === "🍒") return 50;
-        if (symbol === "🍋") return 100;
-        if (symbol === "🔔") return 150;
-        if (symbol === "💎") return 300;
-        if (symbol === "7️⃣") return 500;
-        // For any additional symbol like 🍀 use a fallback value
-        return 50;
+
+    function activateBonus() {
+      if(!bonusActive && multiplier > 3) {
+        bonusActive = true;
+        document.body.style.background = 'linear-gradient(45deg, #1a0a0a, #0a1a1a)';
+        setTimeout(() => {
+          bonusActive = false;
+          document.body.style.background = '#0a0a1a';
+        }, 5000);
       }
-      // For more than 3 consecutive, add a bonus per extra symbol
-      let bonus = (count - 3) * 20;
-      if (symbol === "🍒") return 50 + bonus;
-      if (symbol === "🍋") return 100 + bonus;
-      if (symbol === "🔔") return 150 + bonus;
-      if (symbol === "💎") return 300 + bonus;
-      if (symbol === "7️⃣") return 500 + bonus;
-      return 50 + bonus;
     }
-    
-    spinButton.addEventListener("click", spin);
+
+    function updateDisplay() {
+      document.getElementById('tokens').textContent = tokens;
+    }
+
+    document.body.addEventListener('click', spin);
   </script>
 </body>
 </html>
