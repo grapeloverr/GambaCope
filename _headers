@@ -1,3 +1,2 @@
-/*
-  Content-Security-Policy: frame-ancestors *
-  X-Frame-Options: SAMEORIGIN
+Content-Security-Policy: frame-ancestors 'self' https://app.jotform.com/250547248437159 https://gambacopecord.netlify.app/
+X-Frame-Options: ALLOW-FROM https://app.jotform.com/250547248437159  https://gambacopecord.netlify.app/
