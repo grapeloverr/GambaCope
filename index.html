@@ -1,173 +1,101 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>No Limit Megavolt Slot</title>
-  <style>
-    :root {
-      --win-glow: radial-gradient(circle, #ffd700 0%, #ff8c00 70%, #ff4500 100%);
-    }
-
-    body {
-      background: #0a0a1a;
-      font-family: 'Arial Black', sans-serif;
-      overflow: hidden;
-    }
-
-    .slot-container {
-      position: relative;
-      padding: 20px;
-      perspective: 1000px;
-    }
-
-    .grid-6x6 {
-      display: grid;
-      grid-template: repeat(6, 1fr) / repeat(6, 1fr);
-      gap: 5px;
-      transform-style: preserve-3d;
-    }
-
-    .cell {
-      width: 70px;
-      height: 70px;
-      background: #1a1a2a;
-      border: 2px solid #303045;
-      border-radius: 10px;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      font-size: 32px;
-      transition: all 0.3s ease;
-      transform: rotateX(25deg);
-      box-shadow: 0 5px 15px rgba(0,0,0,0.3);
-    }
-
-    .winning-cell {
-      animation: cell-win 1s ease infinite;
-      background: var(--win-glow);
-    }
-
-    @keyframes cell-win {
-      0% { transform: rotateX(25deg) scale(1); }
-      50% { transform: rotateX(25deg) scale(1.1); }
-      100% { transform: rotateX(25deg) scale(1); }
-    }
-
-    .meter {
-      position: fixed;
-      top: 20px;
-      right: 20px;
-      background: rgba(0,0,0,0.7);
-      padding: 15px;
-      border-radius: 10px;
-      color: #fff;
-      text-shadow: 0 0 10px #00ffff;
-    }
-
-    #multiplier {
-      color: #ffd700;
-      font-size: 24px;
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Luxury 6x6 Slot Machine</title>
+    <link rel="stylesheet" href="styles/main.css">
+    <link rel="stylesheet" href="styles/animations.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
 <body>
-  <div class="slot-container">
-    <div class="grid-6x6" id="grid"></div>
-    <div class="meter">
-      Tokens: <span id="tokens">1000</span><br>
-      Multiplier: <span id="multiplier">1x</span>
+    <div class="game-container">
+        <div class="game-header">
+            <div class="logo">DARK FORTUNE</div>
+            <div class="multiplier-display">
+                <div class="multiplier-value">1<span>x</span></div>
+                <div class="multiplier-progress">
+                    <div class="progress-bar"></div>
+                </div>
+            </div>
+            <div class="bonus-meter">
+                <div class="bonus-text">BONUS</div>
+                <div class="bonus-progress">
+                    <div class="bonus-bar"></div>
+                </div>
+                <div class="bonus-count">0/3</div>
+            </div>
+            <div class="balance-display">
+                <span class="balance-label">BALANCE</span>
+                <span class="balance-value">1000</span>
+            </div>
+        </div>
+
+        <div class="slot-machine">
+            <div class="grid-container">
+                <!-- Grid will be dynamically populated -->
+            </div>
+            <div class="win-overlay">
+                <div class="win-amount">+500</div>
+                <div class="win-text">BIG WIN</div>
+            </div>
+            <div class="bonus-overlay">
+                <div class="bonus-title">FREE SPINS ACTIVATED</div>
+                <div class="bonus-subtitle">10 FREE SPINS</div>
+                <div class="bonus-multiplier">ALL WINS x3</div>
+            </div>
+        </div>
+
+        <div class="game-controls">
+            <div class="bet-controls">
+                <button id="decrease-bet" class="control-btn"><i class="fas fa-minus"></i></button>
+                <div class="bet-display">
+                    <span class="bet-label">BET</span>
+                    <span id="bet-amount">50</span>
+                </div>
+                <button id="increase-bet" class="control-btn"><i class="fas fa-plus"></i></button>
+            </div>
+            <button id="spin-button" class="spin-btn">SPIN</button>
+            <button id="auto-spin" class="control-btn">AUTO</button>
+            <button id="max-bet" class="control-btn">MAX BET</button>
+            <button id="info-button" class="control-btn"><i class="fas fa-info-circle"></i></button>
+        </div>
     </div>
-  </div>
 
-  <audio id="spinSound" src="spin.mp3"></audio>
-  <audio id="winSound" src="win.mp3"></audio>
-  <audio id="bonusSound" src="bonus.mp3"></audio>
+    <div class="info-panel">
+        <div class="info-content">
+            <h2>Game Rules</h2>
+            <div class="rules-content">
+                <p>Match 3 or more symbols in any direction to win.</p>
+                <p>Consecutive wins increase your multiplier:</p>
+                <ul>
+                    <li>1st Win: 1x</li>
+                    <li>2nd Win: 1.5x</li>
+                    <li>3rd Win: 2x</li>
+                    <li>4th Win: 3x</li>
+                    <li>5th Win: 5x</li>
+                    <li>6th+ Win: 8x</li>
+                </ul>
+                <h3>Bonus Feature</h3>
+                <p>Collect 3 bonus symbols to activate 10 FREE SPINS with a 3x multiplier on all wins!</p>
+                <h3>Symbol Values</h3>
+                <div class="symbol-values">
+                    <!-- Symbol values will be added here -->
+                </div>
+            </div>
+            <button id="close-info" class="close-btn">CLOSE</button>
+        </div>
+    </div>
 
-  <script>
-    const symbols = ["🍒", "🍋", "🔔", "💎", "7️⃣", "⭐", "☄️", "🎰"];
-    let tokens = 1000;
-    let multiplier = 1;
-    let bonusActive = false;
-
-    // Initialize grid
-    const grid = Array.from({length: 36}, (_, i) => {
-      const cell = document.createElement('div');
-      cell.className = 'cell';
-      cell.textContent = symbols[Math.floor(Math.random() * symbols.length)];
-      document.getElementById('grid').appendChild(cell);
-      return cell;
-    });
-
-    // Enhanced win patterns including diagonals
-    const winPatterns = [
-      // Horizontal lines
-      ...[0,1,2,3].map(y => [y*6, y*6+1, y*6+2, y*6+3, y*6+4, y*6+5]),
-      // Vertical lines
-      ...[0,1,2,3].map(x => [x, x+6, x+12, x+18, x+24, x+30]),
-      // Diagonals
-      [0,7,14,21,28,35], [5,10,15,20,25,30]
-    ];
-
-    function spin() {
-      if(tokens < 50) return alert("Game Over!");
-      tokens -= 50;
-      updateDisplay();
-      
-      grid.forEach(cell => {
-        cell.classList.remove('winning-cell');
-        cell.style.animation = 'none';
-        setTimeout(() => {
-          cell.textContent = symbols[Math.floor(Math.random() * symbols.length)];
-          cell.style.animation = 'spin 0.8s ease';
-        }, Math.random() * 300);
-      });
-
-      setTimeout(checkWins, 1000);
-    }
-
-    function checkWins() {
-      let totalWin = 0;
-      const winningCells = new Set();
-
-      winPatterns.forEach(pattern => {
-        const symbolsInLine = pattern.map(i => grid[i].textContent);
-        if(new Set(symbolsInLine).size === 1) {
-          pattern.forEach(i => winningCells.add(i));
-          totalWin += getSymbolValue(symbolsInLine[0]) * multiplier;
-          activateBonus();
-        }
-      });
-
-      if(winningCells.size > 0) {
-        winningCells.forEach(i => {
-          grid[i].classList.add('winning-cell');
-          if(Math.random() < 0.3) multiplier++;
-        });
-        tokens += totalWin;
-        updateDisplay();
-        document.getElementById('multiplier').textContent = `${multiplier}x`;
-        playSound(winningCells.size > 6 ? 'bonusSound' : 'winSound');
-      } else {
-        multiplier = 1;
-      }
-    }
-
-    function activateBonus() {
-      if(!bonusActive && multiplier > 3) {
-        bonusActive = true;
-        document.body.style.background = 'linear-gradient(45deg, #1a0a0a, #0a1a1a)';
-        setTimeout(() => {
-          bonusActive = false;
-          document.body.style.background = '#0a0a1a';
-        }, 5000);
-      }
-    }
-
-    function updateDisplay() {
-      document.getElementById('tokens').textContent = tokens;
-    }
-
-    document.body.addEventListener('click', spin);
-  </script>
+    <script src="scripts/utils.js"></script>
+    <script src="scripts/symbols.js"></script>
+    <script src="scripts/grid.js"></script>
+    <script src="scripts/multiplier.js"></script>
+    <script src="scripts/animations.js"></script>
+    <script src="scripts/audio.js"></script>
+    <script src="scripts/bonus.js"></script>
+    <script src="scripts/game.js"></script>
+    <script src="scripts/main.js"></script>
 </body>
 </html>
