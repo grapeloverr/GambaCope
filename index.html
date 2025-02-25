@@ -3,39 +3,55 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Slot Machine with Spinner</title>
+    <title>Neon Vortex Slot</title>
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <div class="slot-machine">
-        <div class="reels">
-            <div class="reel">
-                <div class="symbol">7</div>
-                <div class="symbol">BAR</div>
-                <div class="symbol">CHERRY</div>
-                <div class="symbol">LEMON</div>
-                <div class="symbol">ORANGE</div>
+    <div class="game-container">
+        <header class="game-header">
+            <div class="balance-box">
+                <span>Balance:</span>
+                <span id="balance">1000</span>
             </div>
-            <div class="reel">
-                <div class="symbol">7</div>
-                <div class="symbol">BAR</div>
-                <div class="symbol">CHERRY</div>
-                <div class="symbol">LEMON</div>
-                <div class="symbol">ORANGE</div>
+            <div class="title-box">
+                <h1>🜁 NEON VORTEX ☍</h1>
             </div>
-            <div class="reel">
-                <div class="symbol">7</div>
-                <div class="symbol">BAR</div>
-                <div class="symbol">CHERRY</div>
-                <div class="symbol">LEMON</div>
-                <div class="symbol">ORANGE</div>
+            <div class="win-box">
+                <span>Win:</span>
+                <span id="last-win">0</span>
+            </div>
+        </header>
+
+        <div class="slot-grid">
+            <div class="reel-container">
+                <div class="reel" data-reel="1">
+                    <div class="symbol">⚡</div>
+                    <div class="symbol">♦</div>
+                    <div class="symbol">♠</div>
+                </div>
+                <!-- Repeat for reels 2-5 -->
             </div>
         </div>
-        <button id="spinButton">Spin</button>
+
+        <div class="control-panel">
+            <div class="bet-controls">
+                <button class="bet-modifier" id="half-bet">½</button>
+                <div class="bet-display">
+                    <span>Bet:</span>
+                    <span id="current-bet">10</span>
+                </div>
+                <button class="bet-modifier" id="double-bet">2×</button>
+            </div>
+            
+            <div class="spin-controls">
+                <button id="spin-button" class="neon-button">
+                    <span class="spinner"></span>
+                    SPIN
+                </button>
+            </div>
+        </div>
     </div>
-    <div class="spinner-container" id="spinnerContainer">
-        <div class="spinner"></div>
-    </div>
-    <script src="script.js"></script>
+
+    <script src="scripts.js"></script>
 </body>
 </html>
