@@ -1,42 +1,13 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Cyberpunk 6x6 Slot Machine</title>
-  <link rel="stylesheet" href="styles.css" />
-</head>
-<body>
-  <div class="game-container">
-    <header class="header-panel">
-      <div class="balance">
-        Balance: <span id="balance">1000</span>
-      </div>
-      <div class="bet-controls">
-        <button id="decrease-bet">- Bet</button>
-        <span id="bet-value">10</span>
-        <button id="increase-bet">+ Bet</button>
-      </div>
-      <div class="jackpot">
-        Jackpot: <span id="jackpot">5000</span>
-      </div>
-    </header>
-
-    <main class="game-grid">
-      <!-- 6x6 grid cells will be generated dynamically -->
-    </main>
-
-    <footer class="footer-controls">
-      <button id="spin-btn">Spin</button>
-      <button id="auto-spin-btn">Auto Spin</button>
-    </footer>
+<div class="game-container">
+  <header class="game-header">
+    <div class="balance">Balance: <span id="balance">1000</span></div>
+    <div class="bet">Bet: <span id="bet">10</span></div>
+  </header>
+  <div class="game-grid">
+    <!-- 6x6 grid of reels -->
   </div>
-
-  <!-- Audio elements -->
-  <audio id="spin-sound" src="sounds/spin.mp3"></audio>
-  <audio id="win-chime" src="sounds/win.mp3"></audio>
-  <audio id="bg-music" src="sounds/ambient.mp3" loop></audio>
-
-  <script src="game.js"></script>
-</body>
-</html>
+  <footer class="game-controls">
+    <button id="spin-btn">Spin</button>
+    <button id="auto-spin-btn">Auto Spin</button>
+  </footer>
+</div>
