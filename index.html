@@ -5,24 +5,125 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Cope Tokens Slot Machine</title>
     <style>
-        body { font-family: Arial, sans-serif; background-color: #121212; color: #ffffff; text-align: center; margin: 0; padding: 20px; overflow: hidden; }
-        .container { max-width: 800px; margin: 0 auto; background-color: #1e1e1e; border-radius: 15px; padding: 30px; box-shadow: 0 0 30px rgba(0, 0, 0, 0.7); border: 2px solid #ff9800; }
-        h1 { color: #ff9800; font-size: 36px; margin-bottom: 30px; text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5); }
-        .slot-machine { display: grid; grid-template-columns: repeat(5, 100px); grid-template-rows: repeat(3, 100px); gap: 15px; justify-content: center; margin: 20px 0; perspective: 1000px; }
-        .reel { width: 100px; height: 100px; background-color: #222; border-radius: 10px; display: flex; justify-content: center; align-items: center; font-size: 50px; box-shadow: inset 0 0 15px rgba(0, 0, 0, 0.8), 0 0 20px rgba(255, 152, 0, 0.5); transition: transform 0.3s; transform-style: preserve-3d; }
-        .reel:hover { transform: scale(1.1); }
-        #spin-btn { background-color: #ff9800; color: white; border: none; padding: 15px 40px; font-size: 20px; border-radius: 10px; cursor: pointer; margin: 20px 0; transition: background-color 0.3s, transform 0.3s; box-shadow: 0 0 20px rgba(255, 152, 0, 0.5); }
-        #spin-btn:hover { background-color: #f57c00; transform: scale(1.05); }
-        #spin-btn:disabled { background-color: #666; cursor: not-allowed; box-shadow: none; }
-        .tokens { font-size: 28px; margin: 20px 0; color: #ffeb3b; text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5); }
-        .result { font-size: 24px; height: 30px; margin: 20px 0; color: #4caf50; text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5); }
-        .symbols { margin-top: 30px; font-size: 16px; color: #aaa; text-align: left; }
-        .bonus-info { font-size: 20px; color: #ffeb3b; margin-top: 20px; text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5); }
-        @keyframes spin { 0% { transform: rotateX(0deg); } 100% { transform: rotateX(360deg); } }
-        @keyframes shine { 0% { opacity: 0; } 50% { opacity: 1; } 100% { opacity: 0; } }
-        .reel.spinning { animation: spin 1s infinite linear; }
-        .reel.winning { animation: shine 1s infinite; }
-        .multiplier { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 36px; color: #ffeb3b; text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5); animation: shine 1s infinite; }
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #121212;
+            color: #ffffff;
+            text-align: center;
+            margin: 0;
+            padding: 20px;
+            overflow: hidden;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background-color: #1e1e1e;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 0 30px rgba(0, 0, 0, 0.7);
+            border: 2px solid #ff9800;
+        }
+        h1 {
+            color: #ff9800;
+            font-size: 36px;
+            margin-bottom: 20px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+        }
+        .slot-machine {
+            display: grid;
+            grid-template-columns: repeat(5, 100px);
+            grid-template-rows: repeat(3, 100px);
+            gap: 10px;
+            justify-content: center;
+            margin: 20px 0;
+        }
+        .reel {
+            width: 100px;
+            height: 100px;
+            background-color: #222;
+            border-radius: 10px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 50px;
+            box-shadow: inset 0 0 15px rgba(0, 0, 0, 0.8), 0 0 20px rgba(255, 152, 0, 0.5);
+            transition: transform 0.3s;
+            transform-style: preserve-3d;
+        }
+        .reel:hover {
+            transform: scale(1.1);
+        }
+        #spin-btn {
+            background-color: #ff9800;
+            color: white;
+            border: none;
+            padding: 15px 40px;
+            font-size: 20px;
+            border-radius: 10px;
+            cursor: pointer;
+            margin: 20px 0;
+            transition: background-color 0.3s, transform 0.3s;
+            box-shadow: 0 0 20px rgba(255, 152, 0, 0.5);
+        }
+        #spin-btn:hover {
+            background-color: #f57c00;
+            transform: scale(1.05);
+        }
+        #spin-btn:disabled {
+            background-color: #666;
+            cursor: not-allowed;
+            box-shadow: none;
+        }
+        .tokens {
+            font-size: 24px;
+            margin: 20px 0;
+            color: #ffeb3b;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+        }
+        .result {
+            font-size: 24px;
+            height: 30px;
+            margin: 20px 0;
+            color: #4caf50;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+        }
+        .symbols {
+            margin-top: 30px;
+            font-size: 16px;
+            color: #aaa;
+            text-align: left;
+        }
+        .bonus-info {
+            font-size: 20px;
+            color: #ffeb3b;
+            margin-top: 20px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+        }
+        @keyframes spin {
+            0% { transform: rotateX(0deg); }
+            100% { transform: rotateX(360deg); }
+        }
+        @keyframes shine {
+            0% { opacity: 0; }
+            50% { opacity: 1; }
+            100% { opacity: 0; }
+        }
+        .reel.spinning {
+            animation: spin 1s infinite linear;
+        }
+        .reel.winning {
+            animation: shine 1s infinite;
+        }
+        .multiplier {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 36px;
+            color: #ffeb3b;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+            animation: shine 1s infinite;
+        }
     </style>
 </head>
 <body>
@@ -78,7 +179,7 @@
         let isSpinning = false;
         let freeSpins = 0;
         let currentMultiplier = 1;
-        const userId = 'YOUR_USER_ID';
+        const userId = 'YOUR_USER_ID'; // Replace with the actual user ID
 
         const symbols = [
             { symbol: '🍒', value: 50, probability: 30 },
