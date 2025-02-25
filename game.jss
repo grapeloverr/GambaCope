@@ -1,215 +1,224 @@
-class SlotMachine {
-  constructor() {
-    // Load state from local storage or use defaults
-    this.balance = parseInt(localStorage.getItem('balance')) || 1000;
-    this.bet = 10;
-    this.jackpot = parseInt(localStorage.getItem('jackpot')) || 5000;
-    this.symbols = ['♠', '♥', '♦', '♣', '★', '⚡', '♞', '♟'];
-    this.isSpinning = false;
-    this.autoSpin = false;
-    this.consecutiveWins = 0;
+const reels = Array.from({ length: 15 }, (_, i) => document.getElementById(`reel${i + 1}`));
+const spinButton = document.getElementById('spin-btn');
+const tokenCountElement = document.getElementById('token-count');
+const resultTextElement = document.getElementById('result-text');
+const bonusInfoElement = document.getElementById('bonus-info');
+const spinSound = document.getElementById('spin-sound');
+const winSound = document.getElementById('win-sound');
+const bonusSound = document.getElementById('bonus-sound');
 
-    // Get DOM elements
-    this.balanceEl = document.getElementById('balance');
-    this.betEl = document.getElementById('bet-value');
-    this.jackpotEl = document.getElementById('jackpot');
-    this.spinBtn = document.getElementById('spin-btn');
-    this.autoSpinBtn = document.getElementById('auto-spin-btn');
-    this.gameGrid = document.querySelector('.game-grid');
-    this.spinSound = document.getElementById('spin-sound');
-    this.winChime = document.getElementById('win-chime');
-    this.bgMusic = document.getElementById('bg-music');
+let tokens = 1000;
+const spinCost = 10;
+let isSpinning = false;
+let freeSpins = 0;
+let currentMultiplier = 1;
+const userId = 'YOUR_USER_ID';
 
-    // Initialize the grid cells
-    this.initGrid();
+const symbols = [
+    { symbol: '🍒', value: 50, probability: 30 },
+    { symbol: '🍋', value: 100, probability: 20 },
+    { symbol: '🔔', value: 150, probability: 15 },
+    { symbol: '💎', value: 300, probability: 10 },
+    { symbol: '7️⃣', value: 500, probability: 5 },
+    { symbol: '❓', value: 0, probability: 20 },
+    { symbol: '🍇', value: 0, probability: 5 }
+];
 
-    // Bind event handlers
-    this.spinBtn.addEventListener('click', () => this.startSpin());
-    this.autoSpinBtn.addEventListener('click', () => this.toggleAutoSpin());
-    document.getElementById('decrease-bet').addEventListener('click', () => this.changeBet(-5));
-    document.getElementById('increase-bet').addEventListener('click', () => this.changeBet(5));
+const multipliers = [2, 4, 8, 16, 32];
 
-    // Set up background music
-    this.bgMusic.volume = 0.5;
-    this.bgMusic.play();
-    this.updateDisplay();
-  }
-  
-  initGrid() {
-    // Clear existing cells and set up a 6x6 grid
-    this.gameGrid.innerHTML = '';
-    for (let i = 0; i < 36; i++) {
-      const cell = document.createElement('div');
-      cell.classList.add('game-cell');
-      cell.setAttribute('data-index', i);
-      cell.textContent = this.randomSymbol();
-      this.gameGrid.appendChild(cell);
-    }
-  }
-
-  randomSymbol() {
-    return this.symbols[Math.floor(Math.random() * this.symbols.length)];
-  }
-  
-  changeBet(amount) {
-    this.bet = Math.max(5, this.bet + amount);
-    this.betEl.textContent = this.bet;
-  }
-  
-  updateDisplay() {
-    this.balanceEl.textContent = this.balance;
-    this.jackpotEl.textContent = this.jackpot;
-    localStorage.setItem('balance', this.balance);
-    localStorage.setItem('jackpot', this.jackpot);
-  }
-  
-  startSpin() {
-    if (this.isSpinning) return;
-    if (this.balance < this.bet) {
-      alert("Not enough balance!");
-      return;
-    }
-    try {
-      this.balance -= this.bet;
-      this.updateDisplay();
-      this.isSpinning = true;
-      this.spinSound.currentTime = 0;
-      this.spinSound.play();
-
-      // Animate each cell with a staggered delay to simulate column‐based spin and realistic inertia
-      const cells = document.querySelectorAll('.game-cell');
-      cells.forEach((cell, index) => {
-        // Adding stagger delay based on column index;
-        // (using modulo on a 6-cell row, adjust delay as needed)
-        const delay = (index % 6) * 50;
-        setTimeout(() => {
-          cell.style.transition = `transform 1s cubic-bezier(0.4, 0, 0.2, 1)`;
-          cell.style.transform = `translateY(-100%)`;
-          cell.addEventListener(
-            'transitionend',
-            () => {
-              cell.textContent = this.randomSymbol();
-              cell.style.transition = '';
-              cell.style.transform = '';
-            },
-            { once: true }
-          );
-        }, delay);
-      });
-      
-      // After animations complete, evaluate for wins
-      setTimeout(() => {
-        this.evaluateWin();
-        this.isSpinning = false;
-        if (this.autoSpin) {
-          setTimeout(() => this.startSpin(), 500);
-        }
-      }, 1200);
-    } catch (error) {
-      console.error("Error during spin:", error);
-      this.isSpinning = false;
-    }
-  }
-  
-  evaluateWin() {
-    // Check win conditions on a 6x6 grid:
-    // • Horizontal lines: 3 or more matching symbols consecutively
-    // • Diagonals: simple check for diagonal clusters of 3 matching symbols
-    // • Plus a 10% chance for a random mystery bonus win
-    let win = false;
-    const cells = Array.from(document.querySelectorAll('.game-cell'));
-    const gridSymbols = [];
-    for (let i = 0; i < 6; i++) {
-      gridSymbols.push(cells.slice(i * 6, (i + 1) * 6).map((c) => c.textContent));
-    }
-
-    // Horizontal win
-    for (let i = 0; i < 6; i++) {
-      let count = 1;
-      for (let j = 1; j < 6; j++) {
-        if (gridSymbols[i][j] === gridSymbols[i][j - 1]) {
-          count++;
-          if (count >= 3) {
-            win = true;
-            this.giveWinReward(20 * count);
-            this.animateWinningCell(i, j);
-          }
-        } else {
-          count = 1;
-        }
-      }
-    }
-
-    // Diagonal win check (basic 3-match diagonal)
-    for (let i = 0; i < 4; i++) {
-      for (let j = 0; j < 4; j++) {
-        const symbol = gridSymbols[i][j];
-        if (
-          symbol === gridSymbols[i + 1][j + 1] &&
-          symbol === gridSymbols[i + 2][j + 2]
-        ) {
-          win = true;
-          this.giveWinReward(30);
-          this.animateWinningCell(i, j);
-        }
-      }
-    }
-
-    // Random mystery bonus (10% chance)
-    if (Math.random() < 0.1) {
-      win = true;
-      this.giveWinReward(50);
-      this.showParticleEffect();
-    }
-    
-    if (!win) {
-      console.log("No win this time. Try again!");
-    }
-  }
-  
-  giveWinReward(amount) {
-    // Increase multiplier for consecutive wins
-    this.consecutiveWins++;
-    const multiplier = 1 + this.consecutiveWins * 0.1;
-    const reward = amount * multiplier;
-    this.balance += reward;
-    this.jackpot += reward * 0.05;
-    this.updateDisplay();
-    this.winChime.play();
-  }
-  
-  animateWinningCell(row, col) {
-    // Calculate index based on 6x6 layout and animate (pulse animation)
-    const index = row * 6 + col;
-    const cell = document.querySelector(`.game-cell[data-index="${index}"]`);
-    if (cell) {
-      cell.style.animation = 'pulse 0.6s ease-in-out';
-      cell.addEventListener('animationend', () => {
-        cell.style.animation = '';
-      }, { once: true });
-    }
-  }
-  
-  showParticleEffect() {
-    // Create a simple particle burst element (placeholder for WebGL integration)
-    const burst = document.createElement('div');
-    burst.className = 'particle-burst';
-    burst.textContent = '💥';
-    burst.style.top = '50%';
-    burst.style.left = '50%';
-    document.body.appendChild(burst);
-    setTimeout(() => burst.remove(), 800);
-  }
-  
-  toggleAutoSpin() {
-    this.autoSpin = !this.autoSpin;
-    this.autoSpinBtn.textContent = this.autoSpin ? 'Stop Auto Spin' : 'Auto Spin';
-    if (this.autoSpin && !this.isSpinning) {
-      this.startSpin();
-    }
-  }
+function updateTokenDisplay() {
+    tokenCountElement.textContent = tokens;
 }
 
-document.addEventListener('DOMContentLoaded', () => {
-  new SlotMachine();
+function checkDailyReward() {
+    const now = new Date();
+    const lastRewardDate = localStorage.getItem('lastDailyReward');
+    if (!lastRewardDate || (now - new Date(lastRewardDate)) >= 86400000) {
+        tokens += 333;
+        fetch('/update-tokens', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ userId, tokens })
+        });
+        updateTokenDisplay();
+        localStorage.setItem('lastDailyReward', now.toISOString());
+        resultTextElement.textContent = "Daily reward claimed! +333 tokens";
+        resultTextElement.style.color = "#ffeb3b";
+        winSound.play();
+    }
+}
+
+async function spinReels() {
+    const results = Array.from({ length: 15 }, () => getRandomSymbol());
+    const spinDuration = 2000;
+    const startTime = Date.now();
+
+    function animate() {
+        const elapsed = Date.now() - startTime;
+        const progress = Math.min(elapsed / spinDuration, 1);
+
+        reels.forEach((reel, i) => {
+            if (progress < 0.7 + (Math.floor(i / 5) * 0.1)) {
+                reel.textContent = symbols[Math.floor(Math.random() * symbols.length)].symbol;
+                reel.classList.add('spinning');
+            } else {
+                reel.textContent = results[i].symbol;
+                reel.classList.remove('spinning');
+            }
+        });
+
+        if (progress < 1) {
+            requestAnimationFrame(animate);
+        } else {
+            checkWin(results);
+            isSpinning = false;
+            spinButton.disabled = false;
+        }
+    }
+
+    animate();
+}
+
+function getRandomSymbol() {
+    const probabilityArray = [];
+    symbols.forEach(item => {
+        for (let i = 0; i < item.probability; i++) {
+            probabilityArray.push(item);
+        }
+    });
+    return probabilityArray[Math.floor(Math.random() * probabilityArray.length)];
+}
+
+function checkWin(results) {
+    const winLines = [
+        [0, 1, 2], [3, 4, 5], [6, 7, 8], [9, 10, 11], [12, 13, 14],
+        [0, 3, 6], [1, 4, 7], [2, 5, 8], [9, 12, 13], [10, 13, 14],
+        [0, 4, 8], [2, 4, 6], [9, 11, 13], [10, 12, 14]
+    ];
+
+    let winAmount = 0;
+    let bonusTriggered = false;
+
+    winLines.forEach(line => {
+        const [a, b, c] = line;
+        if (results[a].symbol === results[b].symbol && results[b].symbol === results[c].symbol) {
+            if (results[a].symbol === '🍇') {
+                bonusTriggered = true;
+            } else {
+                winAmount += results[a].value;
+                reels[a].classList.add('winning');
+                reels[b].classList.add('winning');
+                reels[c].classList.add('winning');
+            }
+        }
+    });
+
+    if (bonusTriggered) {
+        triggerBonusRound();
+    } else if (winAmount > 0) {
+        tokens += winAmount * currentMultiplier;
+        fetch('/update-tokens', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ userId, tokens })
+        });
+        updateTokenDisplay();
+        resultTextElement.textContent = `Winner! +${winAmount * currentMultiplier} tokens`;
+        resultTextElement.style.color = "#4caf50";
+        winSound.play();
+        setTimeout(() => {
+            reels.forEach(reel => reel.classList.remove('winning'));
+        }, 1000);
+    } else {
+        winLines.forEach(line => {
+            const [a, b, c] = line;
+            if (results[a].symbol === results[b].symbol ||
+                results[b].symbol === results[c].symbol ||
+                results[a].symbol === results[c].symbol) {
+                tokens += 5 * currentMultiplier;
+                fetch('/update-tokens', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ userId, tokens })
+                });
+                updateTokenDisplay();
+                resultTextElement.textContent = `Two matches! +${5 * currentMultiplier} tokens`;
+                resultTextElement.style.color = "#2196f3";
+                winSound.play();
+                return;
+            }
+        });
+        resultTextElement.textContent = "Try again!";
+        resultTextElement.style.color = "#ff9800";
+    }
+}
+
+function triggerBonusRound() {
+    freeSpins = 10;
+    currentMultiplier = 2;
+    bonusInfoElement.textContent = "Bonus Round! 10 Free Spins with increasing multipliers!";
+    spinButton.textContent = "SPIN (Free Spin)";
+    spinButton.disabled = false;
+    isSpinning = false;
+    bonusSound.play();
+
+    const multiplierDisplay = document.createElement('div');
+    multiplierDisplay.classList.add('multiplier');
+    multiplierDisplay.textContent = `Multiplier: x${currentMultiplier}`;
+    document.body.appendChild(multiplierDisplay);
+
+    const updateMultiplier = () => {
+        if (freeSpins > 0) {
+            currentMultiplier = multipliers[Math.min(Math.floor(Math.random() * multipliers.length), freeSpins - 1)];
+            multiplierDisplay.textContent = `Multiplier: x${currentMultiplier}`;
+        } else {
+            document.body.removeChild(multiplierDisplay);
+        }
+    };
+
+    const originalSpin = spinReels;
+    spinReels = () => {
+        updateMultiplier();
+        originalSpin();
+    };
+
+    setTimeout(() => {
+        document.body.removeChild(multiplierDisplay);
+        spinReels = originalSpin;
+    }, 10000);
+}
+
+spinButton.addEventListener('click', async () => {
+    if (isSpinning) return;
+
+    if (tokens < spinCost && freeSpins === 0) {
+        resultTextElement.textContent = "Not enough tokens!";
+        resultTextElement.style.color = "#ff5252";
+        return;
+    }
+
+    if (freeSpins === 0) {
+        await fetch('/spin', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ userId, betAmount: spinCost })
+        });
+        tokens -= spinCost;
+        updateTokenDisplay();
+    } else {
+        freeSpins--;
+        if (freeSpins === 0) {
+            spinButton.textContent = "SPIN (10 tokens)";
+            bonusInfoElement.textContent = "";
+        }
+    }
+
+    isSpinning = true;
+    spinButton.disabled = true;
+    resultTextElement.textContent = "";
+    spinSound.play();
+    spinReels();
 });
+
+updateTokenDisplay();
+checkDailyReward();
