@@ -1,264 +1,239 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Golden Fortune Slots</title>
-    <style>
-        /* Base styles remain similar */
-        
-        /* New Animation Styles */
-        @keyframes reelSpin {
-            0% { transform: translateY(0); }
-            100% { transform: translateY(-1000px); }
-        }
-
-        @keyframes winFlash {
-            0%, 100% { background-color: #333; }
-            50% { background-color: #4caf50; }
-        }
-
-        .reel {
-            position: relative;
-            overflow: hidden;
-        }
-
-        .symbols-column {
-            transition: transform 2s cubic-bezier(0.25, 1, 0.5, 1);
-        }
-
-        .win-animation {
-            animation: winFlash 0.5s 3;
-        }
-
-        .bonus-screen {
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            background: rgba(0,0,0,0.9);
-            padding: 2rem;
-            border-radius: 15px;
-            text-align: center;
-            display: none;
-            z-index: 1000;
-        }
-
-        .bonus-wheel {
-            width: 250px;
-            height: 250px;
-            border-radius: 50%;
-            background: conic-gradient(
-                #ff5722 0deg 90deg,
-                #4caf50 90deg 180deg,
-                #2196f3 180deg 270deg,
-                #ffc107 270deg 360deg
-            );
-            margin: 1rem auto;
-            transition: transform 3s cubic-bezier(0.25, 0.1, 0.25, 1);
-        }
-
-        /* Enhanced Win Animation */
-        .win-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0,0,0,0.7);
-            display: none;
-            justify-content: center;
-            align-items: center;
-            z-index: 999;
-        }
-
-        .win-content {
-            text-align: center;
-            color: white;
-            font-size: 3rem;
-            text-shadow: 0 0 10px rgba(255,255,255,0.5);
-        }
-    </style>
-</head>
-<body>
-    <div class="container">
-        <h1>Golden Fortune Slots</h1>
-        
-        <div class="tokens">
-            Tokens: <span id="token-count">1000</span> 
-            | Jackpot: <span id="jackpot">5000</span>
-        </div>
-
-        <div class="slot-machine">
-            <div class="reel" id="reel1"></div>
-            <div class="reel" id="reel2"></div>
-            <div class="reel" id="reel3"></div>
-        </div>
-
-        <button id="spin-btn">SPIN (10 tokens)</button>
-        
-        <!-- Bonus Elements -->
-        <div class="bonus-screen" id="bonusScreen">
-            <h2>BONUS WHEEL!</h2>
-            <div class="bonus-wheel" id="bonusWheel"></div>
-            <p id="bonusResult"></p>
-        </div>
-
-        <div class="win-overlay" id="winOverlay">
-            <div class="win-content">
-                <div class="win-text">WINNER!</div>
-                <div class="win-amount">+500</div>
-            </div>
-        </div>
-    </div>
-
-    <script>
-        const symbols = ['🍒', '🍋', '🔔', '💎', '7️⃣', '⭐'];
-        const reelElements = [document.getElementById('reel1'), 
-                            document.getElementById('reel2'), 
-                            document.getElementById('reel3')];
-        
-        // Initialize reels with symbols
-        reelElements.forEach(reel => {
-            const symbolsColumn = document.createElement('div');
-            symbolsColumn.className = 'symbols-column';
-            
-            // Create multiple symbol copies for seamless animation
-            for(let i = 0; i < 20; i++) {
-                const symbol = document.createElement('div');
-                symbol.className = 'symbol';
-                symbol.textContent = symbols[Math.floor(Math.random() * symbols.length)];
-                symbolsColumn.appendChild(symbol);
-            }
-            
-            reel.appendChild(symbolsColumn);
-        });
-
-        // Bonus Wheel Logic
-        function spinBonusWheel() {
-            const wheel = document.getElementById('bonusWheel');
-            const rotations = Math.random() * 1440 + ;
-            
-            
-            
-            
-            
-            
-            
-            
-            
-            
-            
-            
-            360 * Math.random();
-            
-            
-            
-            
-            
-            
-            
-            
-            360 * Math.random();
-wheel.style.transform = `rotate(${rotations}deg)`;
-
-setTimeout(() => {
-const result = Math.floor((rotations % ) / );
-const prizes = ['+500 TOKENS', 'FREE SPINS x10', 'JACKPOT!', '2X MULTIPLIER'];
-document.getElementById('bonusResult').textContent = prizes[result];
-
-// Apply rewards
-switch(result) {
-case : tokens += ; break;
-case : freeSpins += ; break;
-case : tokens += jackpot; break;
-case : multiplier = ; break;
-}
-updateTokenDisplay();
-}, );
+:root {
+    --dark-bg: #0a0f1d;
+    --accent-blue: #1a2a6c;
+    --neon-cyan: #00f3ff;
+    --metallic-gold: #ffd700;
 }
 
-// Enhanced Spin Logic
-document.getElementById('spin-btn').addEventListener('click', async function() {
-    if(isSpinning) return;
-
-    // Deduct tokens
-    tokens -= spinCost;
-    updateTokenDisplay();
-    
-    // Start spinning animation
-    isSpinning = true;
-    this.disabled = true;
-
-    // Generate final results
-    const results = [];
-    for(let i = ; i < ; i++) {
-results.push(getRandomSymbol());
+body {
+    background: radial-gradient(circle at center, var(--dark-bg), #000);
+    color: white;
+    font-family: 'Segoe UI', system-ui;
+    min-height: 100vh;
+    margin: 0;
+    display: flex;
+    justify-content: center;
 }
 
-// Animate reels
-const animations = [];
-for(let i = ; i < reelElements.length; i++) {
-const reel = reelElements[i];
-const finalPosition = -100 * (Math.floor(Math.random() * ) + );
+.slot-container {
+    LLM served by Perplexity Labs
+<think> Okay, let's see. The user asked for a continuation of the code for a slot machine game. They previously provided the index.html, scripts.js, and part of styles.css but got cut off. Now they're saying "go on," so they need the rest of the CSS and maybe any missing parts.
+First, I need to check where the previous message ended. The styles.css was incomplete, ending with the .slot-container selector. The user needs the complete CSS to make the game look right. Also, maybe the JavaScript in scripts.js was fully provided, but I should verify.
 
-animations.push(new Promise(resolve => {
-reel.style.transition = '';
-reel.style.transform = `translateY(${finalPosition}px)`;
-setTimeout(() => resolve(), );
-}));
+Looking at the code provided, the styles.css was cut off. The user needs the rest of the CSS to ensure all the styling elements like grid, animations, buttons, etc., are properly styled. Without the full CSS, the layout and animations won't work as intended.
+
+I should continue the CSS from where it left off. The .slot-container was started but not completed. Then proceed to define styles for .game-panel, .info-panel, .slot-grid, .slot-cell, animations like spin and win effects, control panel elements, buttons, hover effects, and responsive design for mobile.
+
+Also, check if any parts of the JavaScript were cut off. In the previous response, scripts.js seems complete with functions for initializing the grid, spinning, animations, checking wins, updating balance and multiplier, etc. But it's good to confirm that all necessary parts are there.
+
+Another consideration: the audio elements in index.html reference external URLs. The user might need to host those sounds or replace them, but that's beyond the current scope. Maybe mention it in a note.
+
+Ensure that all classes mentioned in HTML (like .slot-cell, .win-animation) have corresponding styles in CSS. For example, .win-animation might have a glowing effect or color change.
+
+Also, check for any missing interactive elements or dynamic behaviors in JavaScript. For instance, the changeBet function in scripts.js seems incomplete; it adjusts currentBet but doesn't update the display. The user might need to add code to update the bet amount displayed on the page.
+
+Wait, in the JavaScript, the changeBet function is defined but doesn't update the DOM element showing the bet amount. So in the HTML, there's a span with id "bet-amount" that needs to be updated when currentBet changes. So in the changeBet function, after adjusting currentBet, there should be a line like document.getElementById('bet-amount').textContent = currentBet; Also, ensure that currentBet doesn't go below BASE_BET or exceed balance.
+
+Another thing: in startSpin(), there's a check if balance < currentBet to prevent spinning when funds are low. However, when changing bets using changeBet(), it should also ensure that currentBet doesn't exceed balance. So in changeBet(), after adjusting currentBet, add a check like if (currentBet > balance) currentBet = Math.max(BASE_BET, balance); or similar.
+
+Additionally, in the CSS, keyframe animations for spinning and winning need to be defined. For example, @keyframes spin for column animation and @keyframes winPulse for winning symbols.
+
+Responsive design: The user wanted mobile responsiveness. So media queries in CSS for smaller screens to adjust font sizes, padding, grid gaps etc.
+
+Putting it all together: Continue writing the CSS from where it was cut off, ensuring all classes are styled correctly. Then check JavaScript functions for completeness and add necessary updates to DOM elements where missing. Provide notes about potential improvements or dependencies like external audio files.
+</think>
+
+Let me provide the complete CSS file and remaining implementation details:
+
+styles.css (continued)
+
+css
+.slot-container {
+    width: 100%;
+    max-width: 1200px;
+    padding: 2rem;
 }
 
-await Promise.all(animations);
-
-// Check for bonus trigger
-if(results.filter(s => s === '⭐').length >= ) {
-document.getElementById('bonusScreen').style.display = 'block';
-spinBonusWheel();
+.game-panel {
+    background: linear-gradient(145deg, #0d122a 0%, #020617 100%);
+    border-radius: 20px;
+    padding: 2rem;
+    box-shadow: 0 0 50px rgba(0, 243, 255, 0.1);
+    position: relative;
+    overflow: hidden;
 }
 
-// Check wins
-checkWin(results);
-
-isSpinning = false;
-this.disabled = false;
-
-// Progressive Jackpot
-jackpot += ;
-document.getElementById('jackpot').textContent = jackpot;
-
-// Sound Effects
-const audio = new Audio('spin_sound.mp3');
-audio.play();
-});
-
-function checkWin(results) {
-// Existing win logic plus:
-if(results[ ] === results[ ] && results[ ] === results[ ]) {
-showWinAnimation(results[ ].value);
-}
+.info-panel {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 2rem;
 }
 
-function showWinAnimation(amount) {
-const winOverlay = document.getElementById('winOverlay');
-winOverlay.style.display = 'flex';
-document.querySelector('.win-amount').textContent = `+${amount}`;
-
-setTimeout(() => {
-winOverlay.style.display = 'none';
-}, );
+.multiplier-box,
+.balance-box {
+    background: rgba(255, 255, 255, 0.05);
+    padding: 1rem 2rem;
+    border-radius: 10px;
+    border: 1px solid var(--neon-cyan);
+    text-align: center;
 }
 
-// Mobile Optimization
-function handleResize() {
-const isMobile = window.innerWidth <= ;
-document.querySelectorAll('.reel').forEach(reel => {
-reel.style.width = isMobile ? '60px' : '80px';
-reel.style.height = isMobile ? '90px' : '120px';
-});
+.label {
+    display: block;
+    font-size: 0.8rem;
+    color: var(--neon-cyan);
 }
-window.addEventListener('resize', handleResize);
-handleResize();
-    </script>
-</body>
-</html>
+
+.value {
+    font-size: 1.5rem;
+    font-weight: bold;
+}
+
+.slot-grid {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    gap: 0.5rem;
+    perspective: 1000px;
+}
+
+.slot-cell {
+    aspect-ratio: 1;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(0, 243, 255, 0.1);
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2rem;
+    transition: all 0.3s ease;
+}
+
+.slot-cell::before {
+    content: "";
+    position: absolute;
+    inset: -2px;
+    border-radius: inherit;
+    z-index: -1;
+}
+
+.spin-animation {
+    animation: columnSpin 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@keyframes columnSpin {
+    0% { transform: translateY(0); }
+    100% { transform: translateY(-100%); }
+}
+
+.win-animation {
+    animation: winPulse 1s ease-out;
+}
+
+@keyframes winPulse {
+    0% { 
+        transform: scale(1);
+        box-shadow: 0 0 10px var(--neon-cyan);
+        filter: brightness(1);
+    }
+    50% { 
+        transform: scale(1.2);
+        filter brightness(1.5);
+        box-shadow: 0 0 20px var(--neon-cyan);
+    }
+    100% { 
+        transform scale(1);
+        box-shadow none
+        filter brightness(1);
+     }
+}
+
+.multiplier-active {
+ color var(--metallic-gold);
+ text-shadow  0  0  10px var(--metallic-gold);
+ transition all  0  3s ease
+}
+
+ control-panel {
+ margin-top  2rem
+ display flex
+ gap  1rem
+ justify-content center
+ align-items center
+}
+
+ bet-controls {
+ display flex
+ align-items center
+ gap  1rem
+ background rgba(255  255  255  0  05)
+ padding  0  5rem
+ border-radius  25px
+}
+
+ bet-btn {
+ width  35px
+ height  35px
+ border none
+ background var(--accent-blue)
+ color white
+ border-radius  50%
+ cursor pointer
+ transition all  0  2s ease
+}
+
+ bet-btn hover {
+ transform scale(1  1)
+ background var(--neon-cyan)
+}
+
+ bet-amount {
+ min-width  60px
+ text-align center
+ font-weight bold
+}
+
+ spin-button {
+ position relative
+ background linear-gradient(to right var(--accent-blue) #3a7bd5)
+ border none
+ padding  1rem  3rem
+ color white
+ border-radius  25px
+ cursor pointer
+ overflow hidden
+ transition all  0  3s ease
+}
+
+ spin-button disabled {
+ opacity  0  6
+ cursor not-allowed
+}
+
+ glow {
+ position absolute
+ inset -5px
+ background linear-gradient(
+    45deg,
+ rgba(255  255  255  0)25%,
+ rgba(255  255  255  0)40%,
+ rgba(255  255  255)50%,
+ rgba(255  255)) 
+ opacity  
+ animation glowSlide  
+ }
+
+ @keyframes glowSlide {
+      { transform translateX(-150%) skew(-45deg) }
+     100% { transform translateX(150%) skew(-45deg) }
+ }
+
+ auto-spin {
+ display flex align-items center gap  
+ }
+
+ @media (max-width  
+      slot-container { padding  
+      game-panel { padding  
+      slot-cell { font-size  
+      info-panel { flex-direction column gap  
+ }
